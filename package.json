@@ -72,10 +72,14 @@
     },
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/tests/rules/"
+      "/tests/rules/",
+      "/.claude/"
     ],
     "setupFiles": [
       "<rootDir>/jest.setup.ts"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.claude/"
     ]
   }
 }

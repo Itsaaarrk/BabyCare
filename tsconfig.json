@@ -18,5 +18,14 @@
   "include": [
     "**/*.ts",
     "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    ".claude",
+    "android",
+    "ios",
+    "dist",
+    "functions/lib",
+    "functions/node_modules"
   ]
 }
