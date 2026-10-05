@@ -5,6 +5,7 @@ import { getStorage } from 'firebase-admin/storage';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { HttpsError, onCall, type CallableRequest } from 'firebase-functions/v2/https';
 
+import { isRecentSignIn } from './account.js';
 import { maxBabiesFor, maxOwnedRoomsFor, parseBabyInput, parseEntitlement } from './billing.js';
 import {
   INVITE_TTL_MS,
@@ -53,6 +54,8 @@ type Reason =
   | 'room-limit'
   | 'owned-room-limit'
   | 'baby-limit'
+  | 'recent-login-required'
+  | 'owns-room'
   | 'not-found';
 
 const fail = (
@@ -369,6 +372,42 @@ export const removeMember = onCall(async (request) => {
     [`userRooms/${memberId}/${roomId}`]: null,
   });
   await syncClaims(memberId);
+  return { ok: true };
+});
+
+/**
+ * Deletes the caller's account. They leave every room they belong to, and their profile, settings
+ * and sign-in are removed. What they logged in a family's journal stays, under the name they used:
+ * those records belong to the family. A room owner must delete the room first, because rooms
+ * can't be handed over and deleting someone's account must never delete a family's data.
+ */
+export const deleteAccount = onCall(async (request) => {
+  const uid = requireUid(request);
+  if (!isRecentSignIn(request.auth?.token.auth_time, Date.now())) {
+    return fail('failed-precondition', 'recent-login-required', 'Sign in again to confirm.');
+  }
+
+  const roomIds = Object.keys(((await db.ref(`userRooms/${uid}`).get()).val() as object | null) ?? {});
+  const roles = await Promise.all(roomIds.map((roomId) => getRole(roomId, uid)));
+  if (roles.includes('owner')) {
+    return fail('failed-precondition', 'owns-room', 'Delete your family room first.');
+  }
+
+  const removals: Record<string, null> = {
+    [`users/${uid}`]: null,
+    [`userSettings/${uid}`]: null,
+    [`userRooms/${uid}`]: null,
+    [`joinAttempts/${uid}`]: null,
+  };
+  for (const roomId of roomIds) removals[`rooms/${roomId}/members/${uid}`] = null;
+  await db.ref().update(removals);
+
+  try {
+    await getAuth().deleteUser(uid);
+  } catch (error) {
+    // Already gone (a retry after a partial failure): nothing left to delete.
+    if ((error as { code?: string }).code !== 'auth/user-not-found') throw error;
+  }
   return { ok: true };
 });
 

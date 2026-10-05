@@ -147,6 +147,11 @@ export default function SettingsScreen() {
         <Text variant="heading">Account</Text>
         {user?.displayName ? <Text>{user.displayName}</Text> : null}
         <Text muted>{user?.email}</Text>
+        <Button
+          label="Delete account"
+          variant="secondary"
+          onPress={() => router.push('/preferences/delete-account')}
+        />
       </Card>
 
       <Text variant="caption" muted>
