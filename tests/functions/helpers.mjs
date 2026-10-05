@@ -54,6 +54,13 @@ export async function setEntitlement(roomId, entitlement) {
   assert.equal(response.status, 200);
 }
 
+/** True if data exists at `path`, read with admin access (so it can look at other people's data). */
+export async function adminExists(path) {
+  const response = await fetch(`${DB}/${path}.json?ns=${PROJECT}`, { headers: { Authorization: 'Bearer owner' } });
+  assert.equal(response.status, 200);
+  return (await response.json()) !== null;
+}
+
 export async function reasonOf(promise) {
   try {
     await promise;
