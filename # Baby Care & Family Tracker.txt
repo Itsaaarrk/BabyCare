@@ -1,0 +1,1825 @@
+# Baby Care & Family Tracker
+
+## Full Product Specification, Scope, Technical Stack, Architecture & Development Prompt
+
+---
+
+# 1. PROJECT OVERVIEW
+
+Build a modern mobile application for parents, families, and caregivers to collaboratively track the daily care and activities of a baby/newborn.
+
+The application should make recording baby activities extremely fast and simple, especially when the caregiver is busy holding or caring for the baby.
+
+The core concept is:
+
+> **A shared baby-care journal where everyone caring for the baby can quickly record activities and see the baby's daily routine.**
+
+The application must support:
+
+* Baby profiles
+* Family/shared rooms
+* Multiple caregivers
+* Fast activity logging
+* Activity timeline
+* Feeding tracking
+* Diaper tracking
+* Sleep tracking
+* Bath tracking
+* Sunlight/outdoor-time tracking
+* Notes
+* Optional photos
+* Analytics
+* Daily summaries
+* Family member attribution
+* Customizable dashboard
+* QR-code/code-based family invitations
+* Notifications/reminders
+* Secure Firebase-based backend
+
+The application should NOT present itself as a medical diagnostic system.
+
+It is a **baby care/activity tracking application**, not a replacement for professional medical advice.
+
+---
+
+# 2. PRODUCT NAME
+
+Use a temporary working name during development:
+
+**BabyCare**
+
+The architecture should allow the application name and branding to be changed later without requiring major code changes.
+
+---
+
+# 3. TARGET USERS
+
+Primary users:
+
+* Parents
+* Guardians
+* Grandparents
+* Nannies
+* Babysitters
+* Other trusted caregivers
+
+The application should support multiple people caring for the same baby.
+
+---
+
+# 4. CORE PRODUCT VALUE
+
+The application should answer these questions quickly:
+
+1. What happened with the baby today?
+2. When was the baby last fed?
+3. When was the last diaper change?
+4. How long did the baby sleep?
+5. Who performed the activity?
+6. How many activities happened today?
+7. What is the baby's recent routine?
+8. What did the baby do over the last 7 days?
+9. Can another family member see and log the same activities?
+
+The application should minimize typing and navigation.
+
+---
+
+# 5. MVP SCOPE
+
+## 5.1 Baby Profile
+
+Users can create a baby profile.
+
+Fields:
+
+* Baby name
+* Nickname
+* Birth date
+* Birth time (optional)
+* Gender (optional)
+* Baby photo (optional)
+* Notes (optional)
+
+The profile should calculate:
+
+* Baby age in days
+* Baby age in weeks
+* Baby age in months
+
+Example:
+
+> Sofia
+> 12 days old
+
+Users should be able to edit the baby profile.
+
+---
+
+# 6. FAMILY ROOM
+
+The family room is one of the application's primary features.
+
+A family room represents the group of people responsible for caring for a baby.
+
+Example:
+
+> Sofia's Family Room
+
+A room may contain:
+
+* One or more babies
+* Parents
+* Guardians
+* Caregivers
+* Other authorized members
+
+---
+
+## 6.1 Create Room
+
+When a user creates a baby profile, they can create a family room.
+
+The system generates:
+
+* Unique room ID
+* Human-readable join code
+* QR code
+
+Example:
+
+> Family Room
+> Sofia's Family
+> Join Code: K7M4P2
+
+---
+
+# 7. JOIN FAMILY ROOM
+
+Users can join an existing family room using either:
+
+### QR Code
+
+Scan the QR code.
+
+OR
+
+### Join Code
+
+Enter a short verification code.
+
+Example:
+
+> Enter Family Code
+>
+> K7M4P2
+
+After entering the code:
+
+Show:
+
+> Join Sofia's Family Room?
+>
+> Baby: Sofia
+> Created by: Ana
+>
+> [Cancel] [Join Room]
+
+The user must explicitly confirm before joining.
+
+---
+
+# 8. FAMILY MEMBER ROLES
+
+Implement role-based access.
+
+Roles:
+
+### Owner
+
+Can:
+
+* Edit room
+* Edit baby profiles
+* Invite members
+* Remove members
+* Change member roles
+* Delete room
+* View all activities
+* Add/edit/delete activities
+
+### Parent
+
+Can:
+
+* View babies
+* Add activities
+* Edit activities
+* Delete their own activities
+* View analytics
+* Upload photos
+* Invite caregivers if permitted
+
+### Caregiver
+
+Can:
+
+* View baby information
+* Add activities
+* View timeline
+* View analytics
+* Upload photos
+
+Caregivers should have limited administrative permissions.
+
+### Viewer
+
+Can:
+
+* View baby profile
+* View timeline
+* View analytics
+
+Cannot:
+
+* Add activities
+* Edit activities
+* Delete activities
+* Manage members
+
+---
+
+# 9. ACTIVITY TYPES
+
+The MVP should support these activity types.
+
+## 9.1 Feeding
+
+Fields:
+
+* Start time
+* End time
+* Automatically calculated duration
+* Feeding type
+* Amount (optional)
+* Notes
+* Photo (optional)
+* Logged by
+
+Feeding type:
+
+* Breastfeeding
+* Bottle
+* Formula
+* Other
+
+For breastfeeding:
+
+Optional:
+
+* Left
+* Right
+* Both
+
+Example:
+
+> 🍼 Feeding
+> 10:30 PM – 10:48 PM
+> Duration: 18 minutes
+> Breastfeeding
+> Logged by Mom
+
+---
+
+# 10. DIAPER
+
+Fields:
+
+* Date/time
+* Type
+* Notes
+* Optional photo
+* Logged by
+
+Types:
+
+* Pee
+* Poop
+* Pee + Poop
+* Dry
+
+The application should make this extremely fast to log.
+
+Example:
+
+> 🧷 Diaper
+> Pee + Poop
+> 2:32 PM
+> Logged by Dad
+
+---
+
+# 11. SLEEP
+
+Fields:
+
+* Start time
+* End time
+* Automatically calculated duration
+* Notes
+* Logged by
+
+Example:
+
+> 😴 Sleep
+> 1:30 PM – 3:05 PM
+> 1h 35m
+> Logged by Mom
+
+The system should support an active sleep timer.
+
+Example:
+
+> Baby is sleeping
+> Started 1:30 PM
+>
+> [End Sleep]
+
+---
+
+# 12. BATH
+
+Bath types:
+
+* Afternoon
+* Night
+* Other
+
+Fields:
+
+* Start time
+* End time
+* Duration
+* Bath type
+* Notes
+* Optional photo
+* Logged by
+
+---
+
+# 13. SUNLIGHT / OUTDOOR TIME
+
+Track the time the baby spends exposed to sunlight/outdoors.
+
+Fields:
+
+* Start time
+* End time
+* Duration
+* Notes
+* Optional photo
+* Logged by
+
+Important:
+
+The application should NOT make medical claims regarding sunlight exposure.
+
+Use neutral wording such as:
+
+> Outdoor / Sunlight Time
+
+Avoid automatically recommending unsafe exposure.
+
+---
+
+# 14. NOTES
+
+Allow caregivers to create general notes.
+
+Fields:
+
+* Title
+* Description
+* Date/time
+* Photo
+* Logged by
+
+Example:
+
+> 📝 Note
+> Baby was unusually sleepy this afternoon.
+
+---
+
+# 15. OPTIONAL PHOTO ATTACHMENTS
+
+Activities may optionally contain a photo.
+
+Photos can be attached to:
+
+* Diapers
+* Feeding
+* Bath
+* Sunlight
+* Notes
+* Other activities
+
+Photos must be stored securely in Firebase Storage.
+
+Only authorized family-room members can access them.
+
+Do not expose uploaded photos publicly.
+
+---
+
+# 16. QUICK LOGGING
+
+This is one of the most important UX requirements.
+
+The application must make activity logging extremely fast.
+
+The main screen should have large quick-action buttons.
+
+Example:
+
+```text
++--------------------------------+
+|           SOFIA                |
+|          12 days old           |
+|                                |
+| Last Feed: 42 min ago          |
+| Last Diaper: 1h 15m ago        |
+|                                |
+|  🍼 FEED       🧷 DIAPER       |
+|                                |
+|  😴 SLEEP      🛁 BATH         |
+|                                |
+|  ☀️ OUTDOOR    📝 NOTE         |
++--------------------------------+
+```
+
+The user should be able to start logging within one tap.
+
+---
+
+# 17. ACTIVE TIMERS
+
+For activities involving duration, provide start/stop functionality.
+
+Examples:
+
+### Feeding
+
+[Start Feeding]
+
+Then:
+
+> Feeding
+> 00:12:34
+
+[Finish Feeding]
+
+### Sleep
+
+[Start Sleep]
+
+Then:
+
+> Sleeping
+> 01:24:12
+
+[Wake Up]
+
+### Bath
+
+[Start Bath]
+
+Then:
+
+> Bath
+> 00:07:31
+
+[Finish Bath]
+
+The application should automatically calculate duration.
+
+---
+
+# 18. SHAKE-TO-LOG
+
+Implement shake-to-log as an optional feature.
+
+When enabled:
+
+User shakes the phone.
+
+The application opens:
+
+> Quick Log
+
+Then:
+
+* Feeding
+* Diaper
+* Sleep
+* Bath
+* Outdoor
+* Note
+
+The feature must be:
+
+* Disabled by default if necessary for reliability
+* Configurable in Settings
+* Resistant to accidental triggering
+* Debounced so multiple shakes do not open multiple dialogs
+
+Do NOT make shake-to-log the only quick logging mechanism.
+
+Primary interaction should remain the visible quick-action buttons.
+
+---
+
+# 19. HOME DASHBOARD
+
+The home dashboard should provide an immediate overview.
+
+Display:
+
+### Baby
+
+Baby photo
+Baby name
+Age
+
+### Today's Summary
+
+* Feedings
+* Diapers
+* Sleep
+* Bath
+* Outdoor time
+
+### Last Activity
+
+Show the most recent activity.
+
+### Active Activity
+
+If the baby is currently:
+
+* Sleeping
+* Feeding
+* Bathing
+
+show an active timer.
+
+---
+
+# 20. TIMELINE
+
+The timeline should be one of the primary screens.
+
+Example:
+
+```text
+TODAY
+
+11:32 PM
+🧷 Diaper
+Pee + Poop
+Dad
+
+10:30 PM
+🍼 Feeding
+18 minutes
+Mom
+
+09:42 PM
+😴 Sleep
+48 minutes
+Mom
+
+08:30 PM
+🛁 Night Bath
+12 minutes
+Dad
+```
+
+Each activity should display:
+
+* Icon
+* Activity type
+* Time
+* Duration where applicable
+* Important details
+* Who logged it
+* Photo indicator if applicable
+
+Users should be able to tap an activity to view details.
+
+---
+
+# 21. ANALYTICS DASHBOARD
+
+Provide a dedicated analytics screen.
+
+Users should be able to filter by:
+
+* Today
+* Yesterday
+* Last 7 days
+* Last 30 days
+* Custom date range
+
+Activity filters:
+
+* All
+* Feeding
+* Diaper
+* Sleep
+* Bath
+* Outdoor
+* Notes
+
+---
+
+# 22. ANALYTICS
+
+Examples:
+
+### Feeding
+
+* Number of feeding sessions
+* Total feeding duration
+* Average duration
+* Average interval between feeds
+
+### Diaper
+
+* Total diapers
+* Pee count
+* Poop count
+* Pee + Poop count
+
+### Sleep
+
+* Total sleep duration
+* Number of sleep sessions
+* Average sleep duration
+
+### Bath
+
+* Number of baths
+* Total duration
+
+### Outdoor
+
+* Total outdoor time
+
+Use simple, readable charts.
+
+Do not overload the user with complex statistics.
+
+---
+
+# 23. DAILY SUMMARY
+
+Provide a daily summary.
+
+Example:
+
+```text
+SOFIA'S DAY
+
+October 4
+
+🍼 Feeding
+8 sessions
+2h 18m total
+
+🧷 Diapers
+9 total
+6 Pee
+3 Poop
+
+😴 Sleep
+6 sessions
+13h 42m total
+
+🛁 Bath
+1 session
+12 minutes
+
+☀️ Outdoor
+18 minutes
+
+CAREGIVERS
+
+Mom       12 logs
+Dad        7 logs
+Grandma    2 logs
+```
+
+---
+
+# 24. CUSTOMIZABLE DASHBOARD
+
+Users should be able to customize the dashboard.
+
+Settings should allow:
+
+* Baby photo
+* Theme
+* Accent color
+* Visible cards
+* Card ordering
+* Activity visibility
+* Quick-action button ordering
+
+Example:
+
+> Dashboard Settings
+>
+> ☑ Feeding
+> ☑ Diapers
+> ☑ Sleep
+> ☑ Bath
+> ☐ Outdoor
+> ☑ Notes
+
+Users should be able to drag/reorder dashboard cards if practical.
+
+---
+
+# 25. MULTIPLE BABIES
+
+Support multiple babies under a family account/room.
+
+Example:
+
+```text
+My Babies
+
+👶 Sofia
+12 days old
+
+👶 Liam
+2 years old
+```
+
+Each baby must have independent:
+
+* Activities
+* Timeline
+* Analytics
+* Photos
+* Settings
+
+The database architecture must not assume that one user only has one baby.
+
+---
+
+# 26. NOTIFICATIONS
+
+MVP notifications should be limited and useful.
+
+Potential reminders:
+
+* Feeding reminder
+* Medicine reminder if medicine feature is added
+* Custom reminder
+* Activity reminder
+
+Users must control notification preferences.
+
+Avoid excessive notifications.
+
+---
+
+# 27. SETTINGS
+
+Settings should include:
+
+### Baby
+
+* Edit baby profile
+* Change photo
+* Manage babies
+
+### Family Room
+
+* Room information
+* Members
+* Invite members
+* Join code
+* QR code
+* Member roles
+
+### Appearance
+
+* Theme
+* Accent color
+* Dashboard customization
+
+### Quick Logging
+
+* Enable/disable shake-to-log
+* Quick action configuration
+
+### Notifications
+
+* Enable/disable notifications
+* Reminder preferences
+
+### Account
+
+* Profile
+* Email
+* Sign out
+
+---
+
+# 28. AUTHENTICATION
+
+Use Firebase Authentication.
+
+Support:
+
+* Email/password
+* Google Sign-In if practical
+* Apple Sign-In if required for iOS production release
+
+The architecture should make adding additional authentication providers possible.
+
+---
+
+# 29. TECHNOLOGY STACK
+
+## Mobile Framework
+
+**React Native + Expo**
+
+Use:
+
+* React Native
+* Expo
+* TypeScript
+* Expo Router
+
+Use Expo's current stable SDK at implementation time.
+
+---
+
+# 30. FRONTEND STACK
+
+Recommended:
+
+* React Native
+* Expo
+* TypeScript
+* Expo Router
+* React Native Gesture Handler
+* React Native Reanimated
+* React Hook Form
+* Zod
+* TanStack Query where useful
+* Zustand for local UI/application state
+
+Do not introduce libraries unnecessarily.
+
+Prefer native Expo functionality where appropriate.
+
+---
+
+# 31. BACKEND
+
+Use Firebase.
+
+### Firebase Authentication
+
+For:
+
+* User authentication
+* User identity
+
+### Firebase Realtime Database
+
+Use **Realtime Database**, not Firestore, unless there is a documented reason to change the architecture.
+
+Use it for:
+
+* Users
+* Family rooms
+* Membership
+* Baby profiles
+* Activities
+* Settings
+* Dashboard configuration
+
+### Firebase Storage
+
+Use for:
+
+* Baby profile photos
+* Activity photos
+* Other user-uploaded images
+
+### Firebase Cloud Functions
+
+Use Firebase Cloud Functions for:
+
+* Notifications
+* Server-side validation where required
+* Room/invitation operations where appropriate
+* Scheduled tasks
+* Data aggregation where appropriate
+* Cleanup operations
+
+Use the current supported Firebase Functions runtime at implementation time.
+
+---
+
+# 32. FIREBASE ARCHITECTURE
+
+Suggested Realtime Database structure:
+
+```text
+/users/{userId}
+
+/rooms/{roomId}
+
+/rooms/{roomId}/members/{userId}
+
+/rooms/{roomId}/babies/{babyId}
+
+/rooms/{roomId}/babies/{babyId}/activities/{activityId}
+
+/rooms/{roomId}/babies/{babyId}/dailySummaries/{date}
+
+/userSettings/{userId}
+
+/roomSettings/{roomId}
+
+/invitations/{invitationId}
+
+/roomJoinCodes/{joinCode}
+```
+
+The exact structure may be adjusted after inspecting Firebase Realtime Database performance and security requirements.
+
+---
+
+# 33. ACTIVITY DATA MODEL
+
+Use a common activity model.
+
+Example:
+
+```typescript
+type ActivityType =
+  | "feeding"
+  | "diaper"
+  | "sleep"
+  | "bath"
+  | "outdoor"
+  | "note";
+
+interface Activity {
+  id: string;
+  babyId: string;
+  roomId: string;
+  type: ActivityType;
+
+  startedAt: number;
+  endedAt?: number;
+  durationSeconds?: number;
+
+  createdBy: string;
+  createdAt: number;
+  updatedAt: number;
+
+  details?: Record<string, unknown>;
+
+  photoUrl?: string;
+  notes?: string;
+}
+```
+
+Use strongly typed activity-specific data where practical rather than relying entirely on untyped objects.
+
+---
+
+# 34. SECURITY
+
+Firebase Security Rules are critical.
+
+Users must only access data for rooms they belong to.
+
+Requirements:
+
+* Users can only read authorized rooms.
+* Users can only read authorized baby profiles.
+* Users can only read authorized activities.
+* Users cannot modify another user's account information.
+* Role-based permissions must be enforced.
+* Room owner permissions must be enforced.
+* Viewer accounts must not create activities.
+* Users cannot access photos from rooms they don't belong to.
+* Users cannot manipulate membership through client-side writes without appropriate validation.
+
+Never rely solely on frontend authorization.
+
+Frontend authorization is for UX.
+
+Firebase Security Rules are authoritative.
+
+---
+
+# 35. DATA VALIDATION
+
+Validate data at multiple levels:
+
+1. UI validation
+2. TypeScript types
+3. Application/service validation
+4. Firebase Security Rules
+5. Cloud Functions where server-side validation is required
+
+Validate:
+
+* Dates
+* Duration
+* Activity type
+* Room membership
+* Baby ownership
+* File types
+* File sizes
+* Required fields
+
+---
+
+# 36. OFFLINE SUPPORT
+
+The application should remain usable during temporary network interruptions where practical.
+
+Users should be able to:
+
+* Open the application
+* View recently cached information
+* Create activity logs
+
+When connectivity returns, data should synchronize.
+
+Handle:
+
+* Offline writes
+* Duplicate submissions
+* Synchronization conflicts
+* Failed uploads
+
+The UI should clearly communicate synchronization state when necessary.
+
+---
+
+# 37. PHOTO UPLOAD
+
+Photos should:
+
+* Be resized/compressed before upload when practical
+* Have reasonable file-size limits
+* Use Firebase Storage
+* Have secure access
+* Display upload progress
+* Handle failed uploads
+* Allow retry
+
+Do not store large original images unnecessarily.
+
+---
+
+# 38. UI/UX DESIGN
+
+Design direction:
+
+**Warm, friendly, clean, modern, calming, family-oriented.**
+
+Avoid making the application look like a hospital system.
+
+Use:
+
+* Large touch targets
+* Rounded cards
+* Clear icons
+* Soft visual hierarchy
+* High readability
+* Simple navigation
+* Minimal typing
+* Baby-focused visual identity
+
+The interface should feel comfortable for a parent using the app late at night.
+
+---
+
+# 39. ACCESSIBILITY
+
+Support:
+
+* Large touch targets
+* Accessible labels
+* Dynamic text where practical
+* Sufficient contrast
+* Screen-reader-friendly controls
+* Clear error messages
+* Avoid color-only indicators
+
+---
+
+# 40. NAVIGATION
+
+Suggested navigation:
+
+```text
+Home
+Timeline
+Analytics
+Family
+Settings
+```
+
+Home:
+
+* Baby overview
+* Quick actions
+* Today's summary
+
+Timeline:
+
+* Activity history
+
+Analytics:
+
+* Statistics
+* Charts
+* Filters
+
+Family:
+
+* Members
+* Room
+* Invitations
+* QR code
+
+Settings:
+
+* Baby
+* Dashboard
+* Appearance
+* Notifications
+* Account
+
+---
+
+# 41. ERROR HANDLING
+
+Implement centralized error handling.
+
+Handle:
+
+* Authentication errors
+* Network failures
+* Firebase errors
+* Permission errors
+* Photo upload failures
+* Invalid room codes
+* Expired invitations
+* Invalid activity data
+
+Errors should be user-friendly.
+
+Do not expose raw Firebase/internal errors to users.
+
+---
+
+# 42. LOADING STATES
+
+Every asynchronous operation should have appropriate loading states.
+
+Examples:
+
+* Login
+* Creating baby
+* Joining room
+* Loading timeline
+* Saving activity
+* Uploading photo
+* Loading analytics
+
+Use skeleton/loading states where appropriate.
+
+Avoid blank screens.
+
+---
+
+# 43. EMPTY STATES
+
+Design meaningful empty states.
+
+Example:
+
+> No activities yet.
+>
+> Start tracking Sofia's day by logging her first activity.
+
+Button:
+
+> * Log Activity
+
+---
+
+# 44. AUDIT INFORMATION
+
+Activities should maintain:
+
+* Created by
+* Created timestamp
+* Updated timestamp
+
+Where practical, retain information about modifications.
+
+This is important because multiple family members may use the application.
+
+---
+
+# 45. TIMEZONE
+
+Store timestamps consistently.
+
+Use UTC timestamps internally where appropriate.
+
+Display dates/times according to the user's configured timezone.
+
+The application should handle timezone changes safely.
+
+---
+
+# 46. PRIVACY
+
+Baby information and photos are private family data.
+
+Implement:
+
+* Secure Firebase Authentication
+* Firebase Security Rules
+* Private Firebase Storage
+* No public image URLs where avoidable
+* Least-privilege access
+* Secure room membership
+
+Do not expose family room information publicly.
+
+---
+
+# 47. ANALYTICS PRIVACY
+
+Do not collect unnecessary personal information.
+
+Only collect data required for the application.
+
+If analytics/telemetry is added later, make sure it does not unnecessarily expose sensitive baby information.
+
+---
+
+# 48. MONETIZATION ARCHITECTURE
+
+The MVP should be architected so advertising can be added later.
+
+Potential free version:
+
+* One family room
+* Basic tracking
+* Basic analytics
+* Limited photo storage
+
+Potential premium version later:
+
+* More photo storage
+* Advanced analytics
+* PDF reports
+* Multiple baby profiles
+* Advanced reminders
+* Custom themes
+* Export/backup
+
+Ads should never interrupt critical logging flows.
+
+Do not place intrusive ads on:
+
+* Active feeding timer
+* Diaper logging
+* Sleep timer
+* Emergency/important information
+
+If ads are implemented, keep them primarily on non-critical screens.
+
+---
+
+# 49. PERFORMANCE
+
+The application should:
+
+* Start quickly
+* Avoid unnecessary Firebase reads
+* Use realtime listeners only where needed
+* Paginate or limit large activity histories
+* Optimize images
+* Avoid unnecessary React re-renders
+* Memoize expensive calculations
+* Keep analytics calculations efficient
+
+Do not load an entire activity history when only recent data is required.
+
+---
+
+# 50. TESTING
+
+Implement:
+
+### Unit tests
+
+Test:
+
+* Duration calculations
+* Age calculations
+* Activity validation
+* Analytics calculations
+* Date/time handling
+
+### Component tests
+
+Test:
+
+* Activity forms
+* Quick log
+* Timeline
+* Dashboard
+* Filters
+
+### Integration tests
+
+Test:
+
+* Authentication
+* Creating room
+* Joining room
+* Adding members
+* Creating activities
+* Firebase synchronization
+
+### Security tests
+
+Verify:
+
+* Unauthorized users cannot access rooms
+* Viewers cannot create activities
+* Removed members lose access
+* Users cannot access another family's photos/data
+
+---
+
+# 51. PROJECT STRUCTURE
+
+Use a scalable structure similar to:
+
+```text
+src/
+  app/
+    (auth)/
+    (tabs)/
+    baby/
+    activity/
+    family/
+    settings/
+
+  components/
+    ui/
+    baby/
+    activity/
+    dashboard/
+    analytics/
+    family/
+
+  features/
+    auth/
+    babies/
+    activities/
+    family/
+    analytics/
+    settings/
+
+  services/
+    firebase/
+    auth/
+    storage/
+    notifications/
+
+  hooks/
+
+  stores/
+
+  lib/
+    firebase.ts
+    validation/
+    date/
+    analytics/
+
+  types/
+
+  constants/
+
+  utils/
+```
+
+Adapt the structure to Expo Router conventions.
+
+Do not create unnecessary abstractions.
+
+---
+
+# 52. DEVELOPMENT RULES
+
+The coding agent MUST follow these rules:
+
+1. Inspect the existing project before changing anything.
+2. Do not assume files or dependencies exist.
+3. Reuse existing components and utilities where possible.
+4. Avoid unnecessary dependencies.
+5. Use TypeScript strictly.
+6. Keep changes focused.
+7. Do not rewrite unrelated files.
+8. Do not replace Firebase Realtime Database with Firestore.
+9. Do not introduce a separate backend unless explicitly required.
+10. Keep secrets out of source control.
+11. Never hardcode Firebase private credentials.
+12. Use environment variables/configuration for environment-specific values.
+13. Implement Firebase Security Rules early, not at the end.
+14. Test each feature after implementation.
+15. Fix TypeScript errors before moving to the next major feature.
+
+---
+
+# 53. DEVELOPMENT PHASES
+
+## Phase 1 — Project Foundation
+
+Implement:
+
+* Expo project
+* TypeScript
+* Expo Router
+* Firebase configuration
+* Authentication
+* Basic navigation
+* Theme system
+* Environment configuration
+
+Deliverable:
+
+A running application with authentication and navigation.
+
+---
+
+## Phase 2 — Baby Profiles
+
+Implement:
+
+* Create baby
+* Edit baby
+* Baby photo
+* Baby age calculation
+* Multiple babies
+
+Deliverable:
+
+Users can create and manage baby profiles.
+
+---
+
+## Phase 3 — Family Rooms
+
+Implement:
+
+* Create room
+* Join room
+* Join code
+* QR code
+* Members
+* Roles
+* Firebase Security Rules
+
+Deliverable:
+
+Multiple family members can securely share a baby.
+
+---
+
+## Phase 4 — Activity Logging
+
+Implement:
+
+* Feeding
+* Diaper
+* Sleep
+* Bath
+* Outdoor
+* Notes
+* Activity photos
+* Who logged it
+
+Deliverable:
+
+Complete activity logging system.
+
+---
+
+## Phase 5 — Timers
+
+Implement:
+
+* Feeding timer
+* Sleep timer
+* Bath timer
+* Automatic duration calculations
+
+Deliverable:
+
+Users can start/stop activities easily.
+
+---
+
+## Phase 6 — Dashboard
+
+Implement:
+
+* Baby overview
+* Quick actions
+* Today's statistics
+* Active timers
+* Last activity
+
+Deliverable:
+
+Primary home experience.
+
+---
+
+## Phase 7 — Timeline
+
+Implement:
+
+* Daily timeline
+* Activity details
+* Edit activity
+* Delete activity
+* Filtering
+
+Deliverable:
+
+Complete activity history.
+
+---
+
+## Phase 8 — Analytics
+
+Implement:
+
+* Daily analytics
+* 7-day analytics
+* 30-day analytics
+* Custom date range
+* Charts
+* Activity breakdown
+* Caregiver breakdown
+
+Deliverable:
+
+Useful analytics dashboard.
+
+---
+
+## Phase 9 — Customization
+
+Implement:
+
+* Themes
+* Accent color
+* Dashboard cards
+* Dashboard ordering
+* Baby profile customization
+* Quick-action customization
+
+Deliverable:
+
+Personalized user experience.
+
+---
+
+## Phase 10 — Notifications
+
+Implement:
+
+* Reminder framework
+* Notification settings
+* Scheduled reminders
+
+Deliverable:
+
+Configurable reminders.
+
+---
+
+## Phase 11 — Offline/Resilience
+
+Implement:
+
+* Offline activity creation
+* Sync handling
+* Retry handling
+* Upload retry
+* Connection state
+
+Deliverable:
+
+Reliable experience during unstable connectivity.
+
+---
+
+## Phase 12 — Testing & Security
+
+Perform:
+
+* Unit tests
+* Component tests
+* Integration tests
+* Firebase Rules testing
+* Permission testing
+* Performance testing
+* Device testing
+
+---
+
+# 54. MVP ACCEPTANCE CRITERIA
+
+The MVP is considered complete when:
+
+### Authentication
+
+* User can register.
+* User can log in.
+* User can log out.
+* Authentication state persists.
+
+### Baby
+
+* User can create a baby.
+* User can upload a baby photo.
+* User can edit baby information.
+* Multiple babies are supported.
+
+### Family
+
+* User can create a family room.
+* User can generate a QR code.
+* User can generate a join code.
+* Another user can join.
+* Roles work correctly.
+* Unauthorized users cannot access the room.
+
+### Activities
+
+Users can log:
+
+* Feeding
+* Diaper
+* Sleep
+* Bath
+* Outdoor
+* Notes
+
+Each applicable activity supports:
+
+* Start time
+* End time
+* Duration
+* Logged-by information
+* Optional photo
+
+### Dashboard
+
+* Shows baby's information.
+* Shows today's summary.
+* Shows latest activity.
+* Provides quick logging.
+
+### Timeline
+
+* Displays activities chronologically.
+* Displays caregiver.
+* Displays duration.
+* Allows authorized users to edit/delete.
+
+### Analytics
+
+* Daily statistics work.
+* 7-day statistics work.
+* Date filtering works.
+* Activity filtering works.
+
+### Security
+
+* Firebase Security Rules prevent unauthorized access.
+* Room membership is enforced.
+* Viewer permissions work.
+* Storage access is protected.
+
+---
+
+# 55. IMPORTANT PRODUCT PRINCIPLES
+
+The following principles should guide all implementation decisions:
+
+### Principle 1 — Fast
+
+Logging an activity should take seconds, not minutes.
+
+### Principle 2 — Simple
+
+Parents should not need to understand complicated menus.
+
+### Principle 3 — Shared
+
+The application should work naturally for multiple caregivers.
+
+### Principle 4 — Private
+
+Baby information and photos must remain private.
+
+### Principle 5 — Reliable
+
+The application should continue working reasonably well with poor connectivity.
+
+### Principle 6 — Calm
+
+The interface should feel reassuring rather than clinical.
+
+### Principle 7 — Extensible
+
+The architecture must allow future features without requiring a complete rewrite.
+
+---
+
+# 56. FINAL AGENT INSTRUCTION
+
+You are acting as the lead software engineer for this project.
+
+Before writing code:
+
+1. Inspect the entire existing project.
+2. Identify the current framework and dependencies.
+3. Identify Firebase configuration.
+4. Identify existing navigation.
+5. Identify existing UI components.
+6. Identify existing state management.
+7. Identify existing environment configuration.
+8. Identify existing tests.
+9. Identify existing security rules.
+
+Then create an implementation plan based on the specification above.
+
+Do NOT immediately generate the entire application in one step.
+
+Implement the application incrementally by phase.
+
+For each phase:
+
+1. Inspect relevant code.
+2. Create a concise implementation plan.
+3. Implement the feature.
+4. Run TypeScript validation.
+5. Run relevant tests.
+6. Check Firebase Security Rules where applicable.
+7. Review the implementation for unnecessary complexity.
+8. Report what was completed.
+9. Report remaining issues.
+10. Proceed to the next phase only after the current phase is stable.
+
+Never silently skip errors.
+
+If an architectural decision differs from this specification, explain why before implementing it.
+
+Prioritize:
+
+**Security → Correctness → Reliability → UX → Performance → Additional features**
+
+Do not sacrifice security for development speed.
+
+The final application should be production-ready in architecture, even if some advanced features are intentionally deferred from the MVP.

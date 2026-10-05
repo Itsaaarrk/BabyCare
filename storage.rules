@@ -1,0 +1,34 @@
+rules_version = '2';
+
+// Storage rules cannot read the Realtime Database, so room access comes from the `rooms`
+// custom claim ({roomId: role}) that Cloud Functions maintain whenever membership changes.
+// Claims ride on ID tokens, so a removed member can keep reading photos until their token
+// refreshes (at most about an hour). Database data is cut off immediately.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function roleIn(roomId) {
+      return request.auth != null ? request.auth.token.get('rooms', {}).get(roomId, null) : null;
+    }
+    function isImage() {
+      return request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/jpeg');
+    }
+
+    match /rooms/{roomId}/babies/{babyId}/{file} {
+      allow read: if roleIn(roomId) != null;
+      allow create, update: if roleIn(roomId) == 'owner' && isImage();
+      allow delete: if roleIn(roomId) == 'owner';
+    }
+
+    // Activity photos: every member can see them; anyone who can log can add one.
+    match /rooms/{roomId}/babies/{babyId}/activities/{activityId}/{file} {
+      allow read: if roleIn(roomId) != null;
+      allow create, update: if roleIn(roomId) in ['owner', 'parent', 'caregiver'] && isImage();
+      allow delete: if roleIn(roomId) in ['owner', 'parent', 'caregiver'];
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,227 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['displayName', 'createdAt'])",
+        "displayName": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60"
+        },
+        "email": {
+          ".validate": "newData.isString() && newData.val().length <= 254"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "userRooms": {
+      "$uid": {
+        // Maintained by Cloud Functions; clients can only read their own index.
+        ".read": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "userSettings": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['updatedAt'])",
+        "updatedAt": { ".validate": "newData.isNumber()" },
+        "timeZone": { ".validate": "newData.isString() && newData.val().length <= 64" },
+        "shakeToLog": { ".validate": "newData.isBoolean()" },
+        "themeMode": { ".validate": "newData.isString() && (newData.val() === 'system' || newData.val() === 'light' || newData.val() === 'dark')" },
+        "themeAccent": { ".validate": "newData.isString() && (newData.val() === 'peach' || newData.val() === 'rose' || newData.val() === 'sage' || newData.val() === 'sky' || newData.val() === 'lavender')" },
+        "enabledActivities": {
+          "$type": { ".validate": "newData.isBoolean() && ($type === 'feeding' || $type === 'diaper' || $type === 'sleep' || $type === 'bath' || $type === 'outdoor' || $type === 'note')" }
+        },
+        "dashboardCardVisible": {
+          "$type": { ".validate": "newData.isBoolean() && ($type === 'feeding' || $type === 'diaper' || $type === 'sleep' || $type === 'bath' || $type === 'outdoor' || $type === 'note')" }
+        },
+        "quickActionOrder": {
+          "$i": { ".validate": "newData.isString() && (newData.val() === 'feeding' || newData.val() === 'diaper' || newData.val() === 'sleep' || newData.val() === 'bath' || newData.val() === 'outdoor' || newData.val() === 'note')" }
+        },
+        "dashboardCardOrder": {
+          "$i": { ".validate": "newData.isString() && (newData.val() === 'feeding' || newData.val() === 'diaper' || newData.val() === 'sleep' || newData.val() === 'bath' || newData.val() === 'outdoor' || newData.val() === 'note')" }
+        },
+        "notifications": {
+          "enabled": { ".validate": "newData.isBoolean()" },
+          "feedingReminder": {
+            "enabled": { ".validate": "newData.isBoolean()" },
+            "hours": { ".validate": "newData.isNumber() && newData.val() >= 0.5 && newData.val() <= 24" },
+            "$other": { ".validate": false }
+          },
+          "daily": {
+            "$i": {
+              ".validate": "newData.hasChildren(['id', 'hour', 'minute'])",
+              "id": { ".validate": "newData.isString() && newData.val().length <= 40" },
+              "label": { ".validate": "newData.isString() && newData.val().length <= 60" },
+              "hour": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 23" },
+              "minute": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 59" },
+              "enabled": { ".validate": "newData.isBoolean()" },
+              "$other": { ".validate": false }
+            }
+          },
+          "$other": { ".validate": false }
+        },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "roomInvites": {
+      "$roomId": {
+        // Join codes are visible to the people allowed to hand them out. Written by Cloud Functions.
+        ".read": "auth != null && (root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'owner' || root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'parent')"
+      }
+    },
+
+    "rooms": {
+      "$roomId": {
+        ".read": "auth != null && root.child('rooms').child($roomId).child('members').child(auth.uid).exists()",
+
+        // No client can create, delete or re-membership a room. Rooms, members, invites and the
+        // userRooms index are written only by Cloud Functions (Admin SDK bypasses these rules).
+        // Clients may still edit the room name (owner) and baby profiles (owner), below.
+
+        ".validate": "newData.hasChildren(['info', 'members'])",
+
+        "info": {
+          ".write": "auth != null && data.exists() && root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'owner'",
+          ".validate": "newData.hasChildren(['name', 'ownerId', 'ownerName', 'createdAt'])",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80"
+          },
+          "ownerId": {
+            ".validate": "newData.isString() && (!data.exists() || data.val() === newData.val())"
+          },
+          "ownerName": {
+            ".validate": "newData.isString() && newData.val().length <= 60"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber() && (!data.exists() || data.val() === newData.val())"
+          },
+          "$other": { ".validate": false }
+        },
+
+        // Members are readable by every member (inherited) and writable by no client.
+        "members": {},
+
+        "babies": {
+          "$babyId": {
+            ".write": "auth != null && root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'owner'",
+            ".validate": "newData.hasChildren(['name', 'birthDate', 'createdBy', 'createdAt', 'updatedAt'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60"
+            },
+            "nickname": {
+              ".validate": "newData.isString() && newData.val().length <= 40"
+            },
+            "birthDate": {
+              ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}$/)"
+            },
+            "birthTime": {
+              ".validate": "newData.isString() && newData.val().matches(/^([01]\\d|2[0-3]):[0-5]\\d$/)"
+            },
+            "gender": {
+              ".validate": "newData.isString() && (newData.val() === 'girl' || newData.val() === 'boy' || newData.val() === 'other')"
+            },
+            "notes": {
+              ".validate": "newData.isString() && newData.val().length <= 1000"
+            },
+            "photoPath": {
+              ".validate": "newData.isString() && newData.val().length <= 200 && newData.val().beginsWith('rooms/' + $roomId + '/babies/' + $babyId + '/') && newData.val().matches(/^rooms\\/[A-Za-z0-9_-]+\\/babies\\/[A-Za-z0-9_-]+\\/[A-Za-z0-9._-]+$/)"
+            },
+            "createdBy": {
+              ".validate": "newData.isString() && (data.exists() ? data.val() === newData.val() : newData.val() === auth.uid)"
+            },
+            "createdAt": {
+              ".validate": "newData.isNumber() && (!data.exists() || data.val() === newData.val())"
+            },
+            "updatedAt": {
+              ".validate": "newData.isNumber()"
+            },
+
+            "activities": {
+              // Timeline and analytics query by start time.
+              ".indexOn": ["startedAt"],
+              "$activityId": {
+                // owner: anything. parent: create, edit anyone's, delete own. caregiver: create,
+                // edit own, and finish a running timer someone else started. viewer: nothing.
+                ".write": "auth != null && (root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'owner' || (!data.exists() && newData.exists() && (root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'parent' || root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'caregiver')) || (data.exists() && newData.exists() && (root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'parent' || (root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'caregiver' && (data.child('createdBy').val() === auth.uid || (!data.child('endedAt').exists() && (data.child('type').val() === 'feeding' || data.child('type').val() === 'sleep' || data.child('type').val() === 'bath' || data.child('type').val() === 'outdoor')))))) || (data.exists() && !newData.exists() && root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'parent' && data.child('createdBy').val() === auth.uid))",
+                ".validate": "newData.hasChildren(['type', 'startedAt', 'createdBy', 'createdByName', 'createdAt', 'updatedAt']) && (newData.child('type').val() !== 'feeding' || newData.child('details').child('feedingType').exists()) && (newData.child('type').val() !== 'diaper' || newData.child('details').child('diaperType').exists()) && (newData.child('type').val() !== 'bath' || newData.child('details').child('bathType').exists()) && (newData.child('type').val() !== 'note' || newData.child('details').child('title').exists()) && (!newData.child('endedAt').exists() || (newData.child('endedAt').val() >= newData.child('startedAt').val() && (newData.child('type').val() === 'feeding' || newData.child('type').val() === 'sleep' || newData.child('type').val() === 'bath' || newData.child('type').val() === 'outdoor')))",
+                "type": {
+                  ".validate": "newData.isString() && (newData.val() === 'feeding' || newData.val() === 'diaper' || newData.val() === 'sleep' || newData.val() === 'bath' || newData.val() === 'outdoor' || newData.val() === 'note') && (!data.exists() || data.val() === newData.val())"
+                },
+                "startedAt": {
+                  ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= now + 300000"
+                },
+                "endedAt": {
+                  ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= now + 300000"
+                },
+                "durationSeconds": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 172800"
+                },
+                "details": {
+                  "feedingType": {
+                    ".validate": "newData.isString() && (newData.val() === 'breast' || newData.val() === 'bottle' || newData.val() === 'formula' || newData.val() === 'other')"
+                  },
+                  "side": {
+                    ".validate": "newData.isString() && (newData.val() === 'left' || newData.val() === 'right' || newData.val() === 'both')"
+                  },
+                  "amount": {
+                    ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= 2000"
+                  },
+                  "amountUnit": {
+                    ".validate": "newData.isString() && (newData.val() === 'ml' || newData.val() === 'oz')"
+                  },
+                  "diaperType": {
+                    ".validate": "newData.isString() && (newData.val() === 'pee' || newData.val() === 'poop' || newData.val() === 'both' || newData.val() === 'dry')"
+                  },
+                  "bathType": {
+                    ".validate": "newData.isString() && (newData.val() === 'afternoon' || newData.val() === 'night' || newData.val() === 'other')"
+                  },
+                  "title": {
+                    ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80"
+                  },
+                  "$other": { ".validate": false }
+                },
+                "notes": {
+                  ".validate": "newData.isString() && newData.val().length <= 1000"
+                },
+                "photoPath": {
+                  ".validate": "newData.isString() && newData.val().length <= 200 && newData.val().beginsWith('rooms/' + $roomId + '/babies/' + $babyId + '/activities/' + $activityId + '/') && newData.val().matches(/^rooms\\/[A-Za-z0-9_-]+\\/babies\\/[A-Za-z0-9_-]+\\/activities\\/[A-Za-z0-9_-]+\\/[A-Za-z0-9._-]+$/)"
+                },
+                "createdBy": {
+                  ".validate": "newData.isString() && (data.exists() ? data.val() === newData.val() : newData.val() === auth.uid)"
+                },
+                "createdByName": {
+                  ".validate": "newData.isString() && newData.val().length <= 60"
+                },
+                "createdAt": {
+                  ".validate": "newData.isNumber() && (!data.exists() || data.val() === newData.val())"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber()"
+                },
+                "updatedBy": {
+                  ".validate": "newData.isString() && newData.val() === auth.uid"
+                },
+                "$other": { ".validate": false }
+              }
+            },
+
+            "$other": { ".validate": false }
+          }
+        },
+
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}

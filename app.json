@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "BabyCare",
+    "slug": "babycare",
+    "scheme": "babycare",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.babycare"
+    },
+    "android": {
+      "package": "com.tony.gydeon",
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF4EC",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-splash-screen",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "BabyCare uses your photos so you can choose a picture for your baby."
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "BabyCare uses the camera to scan a family invitation QR code.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "reminders"
+        }
+      ],
+      "@react-native-google-signin/google-signin"
+    ]
+  }
+}
