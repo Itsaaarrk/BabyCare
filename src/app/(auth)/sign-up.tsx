@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 
 import { GoogleSignInSection } from '@/components/auth/GoogleSignInSection';
+import { LegalLinks } from '@/components/LegalLinks';
 import { Button } from '@/components/ui/Button';
 import { Screen } from '@/components/ui/Screen';
 import { Text } from '@/components/ui/Text';
@@ -95,6 +96,8 @@ export default function SignUpScreen() {
       <Button label="Create account" onPress={onSubmit} loading={isSubmitting} />
 
       <GoogleSignInSection onError={setFormError} disabled={isSubmitting} />
+
+      <LegalLinks />
 
       <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6 }}>
         <Text muted>Already have an account?</Text>

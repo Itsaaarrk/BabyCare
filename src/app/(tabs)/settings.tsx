@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { LegalLinks } from '@/components/LegalLinks';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ChoiceChips } from '@/components/ui/ChoiceChips';
@@ -160,6 +161,7 @@ export default function SettingsScreen() {
       </Text>
 
       {error ? <Text accessibilityLiveRegion="polite">{error}</Text> : null}
+      <LegalLinks />
       <Button label="Sign out" variant="secondary" onPress={onSignOut} loading={signingOut} />
     </Screen>
   );
