@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
+import { Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { useTheme } from '@/hooks/useTheme';
 import { logHandled, logTrace } from '@/lib/errors';
@@ -66,7 +67,7 @@ export function BabyAvatar({ size, photoPath, localUri, label }: Props) {
           onError={(event) => logHandled(`baby photo failed to display (${uri.slice(0, 80)})`, event.nativeEvent.error)}
         />
       ) : (
-        <Text style={{ fontSize: size * 0.45 }}>👶</Text>
+        <Icon name="baby" size={size * 0.5} color={colors.textMuted} />
       )}
     </View>
   );

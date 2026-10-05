@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 
+import { ActivityIcon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { radius } from '@/constants/theme';
 import { useEnabledTypes } from '@/hooks/useSettings';
@@ -42,7 +43,7 @@ export function QuickActionGrid({ onSelect, running = [] }: Props) {
               opacity: pressed ? 0.8 : 1,
             })}
           >
-            <Text style={{ fontSize: 32 }}>{meta.emoji}</Text>
+            <ActivityIcon type={type} size={32} />
             <Text variant="heading" style={{ fontSize: 17 }}>
               {meta.action}
             </Text>

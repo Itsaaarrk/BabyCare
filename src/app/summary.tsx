@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Share, View } from 'react-native';
 
+import type { IconName } from '@/components/ui/Icon';
+import { IconText } from '@/components/ui/IconText';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Screen } from '@/components/ui/Screen';
@@ -79,13 +81,13 @@ export default function DailySummaryScreen() {
       {summary.total > 0 ? (
         <>
           {on.feeding ? (
-            <Section emoji="🍼" title="Feeding">
+            <Section icon="feeding" title="Feeding">
               <Text>{summary.feeding.count} {summary.feeding.count === 1 ? 'session' : 'sessions'}</Text>
               <Text muted>{formatDuration(summary.feeding.totalSeconds)} total</Text>
             </Section>
           ) : null}
           {on.diaper ? (
-            <Section emoji="🧷" title="Diapers">
+            <Section icon="diaper" title="Diapers">
               <Text>{summary.diaper.total} total</Text>
               <Text muted>
                 {[
@@ -100,19 +102,19 @@ export default function DailySummaryScreen() {
             </Section>
           ) : null}
           {on.sleep ? (
-            <Section emoji="😴" title="Sleep">
+            <Section icon="sleep" title="Sleep">
               <Text>{summary.sleep.count} {summary.sleep.count === 1 ? 'session' : 'sessions'}</Text>
               <Text muted>{formatDuration(summary.sleep.totalSeconds)} total</Text>
             </Section>
           ) : null}
           {on.bath ? (
-            <Section emoji="🛁" title="Bath">
+            <Section icon="bath" title="Bath">
               <Text>{summary.bath.count} {summary.bath.count === 1 ? 'session' : 'sessions'}</Text>
               <Text muted>{formatDuration(summary.bath.totalSeconds)}</Text>
             </Section>
           ) : null}
           {on.outdoor ? (
-            <Section emoji="☀️" title="Outdoor">
+            <Section icon="outdoor" title="Outdoor">
               <Text>{formatDuration(summary.outdoor.totalSeconds)}</Text>
             </Section>
           ) : null}
@@ -136,12 +138,12 @@ export default function DailySummaryScreen() {
   );
 }
 
-function Section({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) {
+function Section({ icon, title, children }: { icon: IconName; title: string; children: React.ReactNode }) {
   return (
     <Card>
-      <Text variant="heading">
-        {emoji} {title}
-      </Text>
+      <IconText icon={icon} variant="heading">
+        {title}
+      </IconText>
       {children}
     </Card>
   );

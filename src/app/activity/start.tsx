@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { ActiveTimerCard } from '@/components/activity/ActiveTimerCard';
+import { Icon } from '@/components/ui/Icon';
+import { IconText } from '@/components/ui/IconText';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ChoiceChips } from '@/components/ui/ChoiceChips';
@@ -45,7 +47,7 @@ export default function StartActivityScreen() {
 
   const running = runningTimers(activities).find((a) => a.type === type);
 
-  const title = <Stack.Screen options={{ title: `${meta.emoji} ${meta.label}` }} />;
+  const title = <Stack.Screen options={{ title: meta.label }} />;
 
   if (!baby || !context) {
     return (
@@ -130,7 +132,7 @@ export default function StartActivityScreen() {
                 opacity: pressed || saved ? 0.7 : 1,
               })}
             >
-              <Text style={{ fontSize: 34 }}>🧷</Text>
+              <Icon name="diaper" size={34} />
               <Text variant="heading">{DIAPER_TYPE_LABELS[diaperType]}</Text>
             </Pressable>
           ))}
@@ -148,9 +150,9 @@ export default function StartActivityScreen() {
     <Screen topInset={false}>
       {title}
       <View style={{ gap: 4 }}>
-        <Text variant="title">
-          {meta.emoji} {meta.label}
-        </Text>
+        <IconText icon={type} variant="title" size={30}>
+          {meta.label}
+        </IconText>
         <Text muted>Start a timer now, or log one that already happened.</Text>
       </View>
 

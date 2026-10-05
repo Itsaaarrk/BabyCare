@@ -7,6 +7,7 @@ import { QuickActionGrid } from '@/components/activity/QuickActionGrid';
 import { SummaryCards } from '@/components/activity/SummaryCards';
 import { BabyAvatar } from '@/components/baby/BabyAvatar';
 import { SyncBanner } from '@/components/SyncBanner';
+import { IconText } from '@/components/ui/IconText';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Screen } from '@/components/ui/Screen';
@@ -170,9 +171,9 @@ export default function HomeScreen() {
                 <Text variant="caption" muted>
                   Last activity
                 </Text>
-                <Text variant="heading">
-                  {ACTIVITY_META[lastActivity.type].emoji} {activityTitle(lastActivity)}
-                </Text>
+                <IconText icon={lastActivity.type} variant="heading">
+                  {activityTitle(lastActivity)}
+                </IconText>
                 <Text muted>
                   {formatClock(lastActivity.startedAt, zone)} · {lastActivity.createdByName}
                   {activityDetailLine(lastActivity) ? ` · ${activityDetailLine(lastActivity)}` : ''}

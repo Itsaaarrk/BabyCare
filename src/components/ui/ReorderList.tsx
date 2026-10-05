@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 
+import { Icon, type IconName } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { MIN_TOUCH_TARGET, radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/useTheme';
@@ -7,7 +8,7 @@ import { useTheme } from '@/hooks/useTheme';
 interface Item {
   key: string;
   label: string;
-  emoji?: string;
+  icon?: IconName;
 }
 
 interface Props {
@@ -39,10 +40,10 @@ export function ReorderList({ items, onMove }: Props) {
             backgroundColor: colors.surface,
           }}
         >
-          <Text style={{ flex: 1 }}>
-            {item.emoji ? `${item.emoji}  ` : ''}
-            {item.label}
-          </Text>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            {item.icon ? <Icon name={item.icon} size={22} /> : null}
+            <Text style={{ flexShrink: 1 }}>{item.label}</Text>
+          </View>
           <Mover
             label={`Move ${item.label} up`}
             glyph="▲"

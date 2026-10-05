@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Alert, View } from 'react-native';
 
 import { ActivityPhoto } from '@/components/activity/ActivityPhoto';
+import { IconText } from '@/components/ui/IconText';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Screen } from '@/components/ui/Screen';
@@ -58,9 +59,9 @@ export default function ActivityDetailScreen() {
   return (
     <Screen topInset={false}>
       <View style={{ gap: 4 }}>
-        <Text variant="title">
-          {meta.emoji} {activityTitle(activity)}
-        </Text>
+        <IconText icon={activity.type} variant="title" size={30}>
+          {activityTitle(activity)}
+        </IconText>
         <Text muted>{day}</Text>
       </View>
 

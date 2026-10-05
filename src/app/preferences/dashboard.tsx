@@ -18,7 +18,7 @@ export default function DashboardPreferencesScreen() {
         {ACTIVITY_TYPES.map((type) => (
           <SwitchRow
             key={type}
-            label={`${ACTIVITY_META[type].emoji}  ${ACTIVITY_META[type].label}`}
+            label={ACTIVITY_META[type].label}
             value={settings.enabledActivities[type]}
             onValueChange={(value) =>
               update({ enabledActivities: { ...settings.enabledActivities, [type]: value } })
@@ -33,7 +33,7 @@ export default function DashboardPreferencesScreen() {
         {settings.dashboardCardOrder.map((type) => (
           <SwitchRow
             key={type}
-            label={`${ACTIVITY_META[type].emoji}  ${ACTIVITY_META[type].label}`}
+            label={ACTIVITY_META[type].label}
             value={settings.dashboardCardVisible[type]}
             disabled={!settings.enabledActivities[type]}
             description={settings.enabledActivities[type] ? undefined : 'Turned off above'}
@@ -49,7 +49,7 @@ export default function DashboardPreferencesScreen() {
           items={settings.dashboardCardOrder.map((type: ActivityType) => ({
             key: type,
             label: ACTIVITY_META[type].label,
-            emoji: ACTIVITY_META[type].emoji,
+            icon: type,
           }))}
           onMove={(index, direction) =>
             update({ dashboardCardOrder: moveItem(settings.dashboardCardOrder, index, direction) })

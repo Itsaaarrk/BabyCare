@@ -2,7 +2,6 @@ import type { Activity, ActivityRecord, ActivityType } from '@/types/activity';
 
 export interface ActivityMeta {
   label: string;
-  emoji: string;
   /** Button label on the home screen. */
   action: string;
   /** Present participle for a running timer, e.g. "Sleeping". */
@@ -12,19 +11,18 @@ export interface ActivityMeta {
 }
 
 export const ACTIVITY_META: Record<ActivityType, ActivityMeta> = {
-  feeding: { label: 'Feeding', emoji: '🍼', action: 'Feed', running: 'Feeding', finish: 'Finish feeding' },
-  diaper: { label: 'Diaper', emoji: '🧷', action: 'Diaper', running: 'Diaper', finish: 'Done' },
-  sleep: { label: 'Sleep', emoji: '😴', action: 'Sleep', running: 'Sleeping', finish: 'Wake up' },
-  bath: { label: 'Bath', emoji: '🛁', action: 'Bath', running: 'Bathing', finish: 'Finish bath' },
+  feeding: { label: 'Feeding', action: 'Feed', running: 'Feeding', finish: 'Finish feeding' },
+  diaper: { label: 'Diaper', action: 'Diaper', running: 'Diaper', finish: 'Done' },
+  sleep: { label: 'Sleep', action: 'Sleep', running: 'Sleeping', finish: 'Wake up' },
+  bath: { label: 'Bath', action: 'Bath', running: 'Bathing', finish: 'Finish bath' },
   // Neutral wording on purpose: the app makes no claims about sunlight exposure.
   outdoor: {
     label: 'Outdoor / Sunlight',
-    emoji: '☀️',
     action: 'Outdoor',
     running: 'Outdoors',
     finish: 'Finish outdoor time',
   },
-  note: { label: 'Note', emoji: '📝', action: 'Note', running: 'Note', finish: 'Done' },
+  note: { label: 'Note', action: 'Note', running: 'Note', finish: 'Done' },
 };
 
 const FEEDING_LABELS = { breast: 'Breastfeeding', bottle: 'Bottle', formula: 'Formula', other: 'Other' } as const;

@@ -18,7 +18,7 @@ export default function QuickLoggingScreen() {
           items={settings.quickActionOrder.map((type) => ({
             key: type,
             label: `${ACTIVITY_META[type].label}${settings.enabledActivities[type] ? '' : ' (off)'}`,
-            emoji: ACTIVITY_META[type].emoji,
+            icon: type,
           }))}
           onMove={(index, direction) =>
             update({ quickActionOrder: moveItem(settings.quickActionOrder, index, direction) })

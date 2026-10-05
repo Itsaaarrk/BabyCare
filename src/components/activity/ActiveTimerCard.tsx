@@ -2,6 +2,7 @@ import { Pressable, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ActivityIcon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { useNow } from '@/hooks/useNow';
 import { useTimeZone } from '@/hooks/useSettings';
@@ -37,7 +38,7 @@ export function ActiveTimerCard({ activity, canFinish, onFinish, onPress }: Prop
         accessibilityHint={onPress ? 'Opens the details' : undefined}
         style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
       >
-        <Text style={{ fontSize: 36 }}>{meta.emoji}</Text>
+        <ActivityIcon type={activity.type} size={36} />
         <View style={{ flex: 1 }}>
           <Text variant="heading">{meta.running}</Text>
           <Text muted>

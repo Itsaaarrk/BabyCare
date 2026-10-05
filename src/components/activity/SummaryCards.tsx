@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 
+import { IconText } from '@/components/ui/IconText';
 import { Text } from '@/components/ui/Text';
 import { radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/useTheme';
@@ -65,9 +66,9 @@ export function SummaryCards({ summary, types, onPress }: Props) {
               backgroundColor: colors.surface,
             }}
           >
-            <Text variant="caption" muted>
-              {meta.emoji} {meta.label}
-            </Text>
+            <IconText icon={type} variant="caption" muted size={16}>
+              {meta.label}
+            </IconText>
             <Text style={{ fontWeight: '600' }}>{line}</Text>
           </Pressable>
         );

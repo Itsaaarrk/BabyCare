@@ -1,12 +1,12 @@
 import { Tabs } from 'expo-router';
-import { Text as RNText } from 'react-native';
+import type { ColorValue } from 'react-native';
 
+import { Icon, type IconName } from '@/components/ui/Icon';
 import { useTheme } from '@/hooks/useTheme';
 
-// Emoji icons keep Phase 1 dependency-free; swap for an icon set in the Customization phase.
-const icon = (glyph: string) =>
-  function TabIcon() {
-    return <RNText style={{ fontSize: 22 }}>{glyph}</RNText>;
+const icon = (name: IconName) =>
+  function TabIcon({ color }: { color: ColorValue }) {
+    return <Icon name={name} size={24} color={color} />;
   };
 
 export default function TabsLayout() {
@@ -20,11 +20,11 @@ export default function TabsLayout() {
         tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: icon('🏠') }} />
-      <Tabs.Screen name="timeline" options={{ title: 'Timeline', tabBarIcon: icon('🕒') }} />
-      <Tabs.Screen name="analytics" options={{ title: 'Analytics', tabBarIcon: icon('📊') }} />
-      <Tabs.Screen name="family" options={{ title: 'Family', tabBarIcon: icon('👨‍👩‍👧') }} />
-      <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarIcon: icon('⚙️') }} />
+      <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: icon('home') }} />
+      <Tabs.Screen name="timeline" options={{ title: 'Timeline', tabBarIcon: icon('timeline') }} />
+      <Tabs.Screen name="analytics" options={{ title: 'Analytics', tabBarIcon: icon('analytics') }} />
+      <Tabs.Screen name="family" options={{ title: 'Family', tabBarIcon: icon('family') }} />
+      <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarIcon: icon('settings') }} />
     </Tabs>
   );
 }

@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 
+import { ActivityIcon, Icon } from '@/components/ui/Icon';
 import { Text } from '@/components/ui/Text';
 import { MIN_TOUCH_TARGET, radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/useTheme';
@@ -58,7 +59,7 @@ export function ActivityRow({ activity, zone, now, onPress }: Props) {
         opacity: pressed ? 0.85 : 1,
       })}
     >
-      <Text style={{ fontSize: 28 }}>{meta.emoji}</Text>
+      <ActivityIcon type={activity.type} size={28} />
       <View style={{ flex: 1 }}>
         <Text style={{ fontWeight: '600' }} numberOfLines={1}>
           {activityTitle(activity)}
@@ -73,7 +74,7 @@ export function ActivityRow({ activity, zone, now, onPress }: Props) {
           {activity.pending ? ' · waiting to sync' : ''}
         </Text>
       </View>
-      {activity.photoPath ? <Text accessibilityElementsHidden>📷</Text> : null}
+      {activity.photoPath ? <Icon name="photo" size={18} /> : null}
     </Pressable>
   );
 }

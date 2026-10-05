@@ -90,7 +90,7 @@ export default function ActivityFormScreen() {
   const meta = ACTIVITY_META[type];
   return (
     <Screen topInset={false}>
-      <Stack.Screen options={{ title: `${meta.emoji} ${existing ? 'Edit' : 'Log'} ${meta.label.toLowerCase()}` }} />
+      <Stack.Screen options={{ title: `${existing ? 'Edit' : 'Log'} ${meta.label.toLowerCase()}` }} />
       <ActivityForm
         key={existing?.id ?? `new-${type}`}
         type={type}

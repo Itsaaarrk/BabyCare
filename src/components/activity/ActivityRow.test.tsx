@@ -22,7 +22,7 @@ describe('ActivityRow', () => {
     });
     render(<ActivityRow activity={feeding} zone={ZONE} now={NOW.getTime()} onPress={jest.fn()} />);
 
-    expect(screen.getByText('🍼')).toBeOnTheScreen();
+    expect(screen.getByTestId('symbol:restaurant', { includeHiddenElements: true })).toBeTruthy();
     expect(screen.getByText('Feeding')).toBeOnTheScreen();
     expect(screen.getByText(/2:30 PM · 18m · Breastfeeding · left/)).toBeOnTheScreen();
     expect(screen.getByText('Mom')).toBeOnTheScreen();
@@ -42,7 +42,7 @@ describe('ActivityRow', () => {
     expect(label).toContain('logged by Dad');
     expect(label).toContain('has a photo');
     expect(label).toContain('waiting to sync');
-    expect(screen.getByText('📷', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.getByTestId('symbol:photo_camera', { includeHiddenElements: true })).toBeTruthy();
   });
 
   it('says a running timer is in progress and opens details when pressed', () => {

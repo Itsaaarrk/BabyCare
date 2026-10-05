@@ -5,6 +5,7 @@ import { BarChart } from '@/components/analytics/BarChart';
 import { Card } from '@/components/ui/Card';
 import { ChoiceChips } from '@/components/ui/ChoiceChips';
 import { DateField } from '@/components/ui/DateField';
+import { IconText } from '@/components/ui/IconText';
 import { Screen } from '@/components/ui/Screen';
 import { Text } from '@/components/ui/Text';
 import { useBabies } from '@/hooks/useBabies';
@@ -173,7 +174,7 @@ function TypeCard({ type, summary: s, series, dayLabel }: TypeCardProps) {
 
   switch (type) {
     case 'feeding':
-      if (s.feeding.count === 0) return <Empty emoji={meta.emoji} label={meta.label} />;
+      if (s.feeding.count === 0) return <Empty type={type} />;
       body = (
         <>
           <Stat label="Sessions" value={count(s.feeding.count)} />
@@ -188,7 +189,7 @@ function TypeCard({ type, summary: s, series, dayLabel }: TypeCardProps) {
       chart = <BarChart title="Feeds per day" buckets={series('count')} format={count} dayLabel={dayLabel} />;
       break;
     case 'diaper':
-      if (s.diaper.total === 0) return <Empty emoji={meta.emoji} label={meta.label} />;
+      if (s.diaper.total === 0) return <Empty type={type} />;
       body = (
         <>
           <Stat label="Total" value={count(s.diaper.total)} />
@@ -201,7 +202,7 @@ function TypeCard({ type, summary: s, series, dayLabel }: TypeCardProps) {
       chart = <BarChart title="Diapers per day" buckets={series('count')} format={count} dayLabel={dayLabel} />;
       break;
     case 'sleep':
-      if (s.sleep.count === 0) return <Empty emoji={meta.emoji} label={meta.label} />;
+      if (s.sleep.count === 0) return <Empty type={type} />;
       body = (
         <>
           <Stat label="Total sleep" value={formatDuration(s.sleep.totalSeconds)} />
@@ -212,7 +213,7 @@ function TypeCard({ type, summary: s, series, dayLabel }: TypeCardProps) {
       chart = <BarChart title="Sleep per day" buckets={series('seconds')} format={formatDuration} dayLabel={dayLabel} />;
       break;
     case 'bath':
-      if (s.bath.count === 0) return <Empty emoji={meta.emoji} label={meta.label} />;
+      if (s.bath.count === 0) return <Empty type={type} />;
       body = (
         <>
           <Stat label="Baths" value={count(s.bath.count)} />
@@ -221,7 +222,7 @@ function TypeCard({ type, summary: s, series, dayLabel }: TypeCardProps) {
       );
       break;
     case 'outdoor':
-      if (s.outdoor.count === 0) return <Empty emoji={meta.emoji} label={meta.label} />;
+      if (s.outdoor.count === 0) return <Empty type={type} />;
       body = (
         <>
           <Stat label="Total time" value={formatDuration(s.outdoor.totalSeconds)} />
@@ -231,28 +232,28 @@ function TypeCard({ type, summary: s, series, dayLabel }: TypeCardProps) {
       chart = <BarChart title="Outdoor time per day" buckets={series('seconds')} format={formatDuration} dayLabel={dayLabel} />;
       break;
     case 'note':
-      if (s.notes.count === 0) return <Empty emoji={meta.emoji} label={meta.label} />;
+      if (s.notes.count === 0) return <Empty type={type} />;
       body = <Stat label="Notes" value={count(s.notes.count)} />;
       break;
   }
 
   return (
     <Card>
-      <Text variant="heading">
-        {meta.emoji} {meta.label}
-      </Text>
+      <IconText icon={type} variant="heading">
+        {meta.label}
+      </IconText>
       {body}
       {chart}
     </Card>
   );
 }
 
-function Empty({ emoji, label }: { emoji: string; label: string }) {
+function Empty({ type }: { type: ActivityType }) {
   return (
     <Card>
-      <Text variant="heading">
-        {emoji} {label}
-      </Text>
+      <IconText icon={type} variant="heading">
+        {ACTIVITY_META[type].label}
+      </IconText>
       <Text muted>Nothing logged in this period.</Text>
     </Card>
   );

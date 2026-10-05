@@ -26,3 +26,13 @@ jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(() => ({})),
   usePathname: jest.fn(() => '/'),
 }));
+
+// Icons are native views. The stand-in keeps the symbol's name findable by testID.
+jest.mock('expo-symbols', () => {
+  const { createElement } = require('react');
+  const { View } = require('react-native');
+  return {
+    SymbolView: ({ name, ...props }: { name: string | { android?: string } }) =>
+      createElement(View, { ...props, testID: 'symbol:' + (typeof name === 'string' ? name : name.android) }),
+  };
+});
