@@ -65,6 +65,7 @@ describe('Home dashboard', () => {
     render(<HomeScreen />);
     expect(screen.getByText('Sofia')).toBeOnTheScreen();
     expect(screen.getByText('12 days old')).toBeOnTheScreen();
+    expect(screen.getByText('Newborn')).toBeOnTheScreen();
     expect(screen.getByLabelText('Log feeding')).toBeOnTheScreen();
     expect(screen.getByLabelText('Log diaper')).toBeOnTheScreen();
   });

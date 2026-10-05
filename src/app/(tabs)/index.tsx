@@ -22,6 +22,7 @@ import { formatAgo } from '@/lib/activity/duration';
 import { ACTIVITY_META, activityDetailLine, activityTitle } from '@/lib/activity/meta';
 import { inRange, latestOfType, runningTimers, summarize } from '@/lib/activity/summary';
 import { formatAge } from '@/lib/date/age';
+import { ageStageLabel } from '@/lib/date/ageStage';
 import { addDays, formatClock, startOfDay } from '@/lib/date/zone';
 import { visibleTypes } from '@/lib/settings';
 import { finishActivity } from '@/services/activities/activityService';
@@ -114,6 +115,11 @@ export default function HomeScreen() {
         <Text variant="heading" muted>
           {formatAge(current.birthDate)}
         </Text>
+        {ageStageLabel(current.birthDate) ? (
+          <Text variant="caption" muted>
+            {ageStageLabel(current.birthDate)}
+          </Text>
+        ) : null}
         <View style={{ marginTop: 6, gap: 2, alignItems: 'center' }}>
           <Text muted>Last feed: {lastFeed ? formatAgo(lastFeed.startedAt, now) : '—'}</Text>
           <Text muted>Last diaper: {lastDiaper ? formatAgo(lastDiaper.startedAt, now) : '—'}</Text>
