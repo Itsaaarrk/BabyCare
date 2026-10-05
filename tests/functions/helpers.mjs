@@ -44,6 +44,16 @@ export async function loadRules() {
   assert.equal(response.status, 200);
 }
 
+/** Sets or clears a room's plan the way the server would: with admin access, bypassing the rules. */
+export async function setEntitlement(roomId, entitlement) {
+  const response = await fetch(`${DB}/rooms/${roomId}/entitlement.json?ns=${PROJECT}`, {
+    method: entitlement ? 'PUT' : 'DELETE',
+    headers: { Authorization: 'Bearer owner' },
+    body: entitlement ? JSON.stringify({ updatedAt: Date.now(), ...entitlement }) : undefined,
+  });
+  assert.equal(response.status, 200);
+}
+
 export async function reasonOf(promise) {
   try {
     await promise;

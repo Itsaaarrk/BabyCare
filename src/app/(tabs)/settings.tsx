@@ -11,6 +11,7 @@ import { Text } from '@/components/ui/Text';
 import { ACCENT_COLORS, MIN_TOUCH_TARGET, type AccentName, type ThemeMode } from '@/constants/theme';
 import { useSettings, useTimeZone } from '@/hooks/useSettings';
 import { useTheme } from '@/hooks/useTheme';
+import { billingEnabled } from '@/lib/billing/config';
 import { toUserMessage } from '@/lib/errors';
 import { signOut } from '@/services/auth/authService';
 import { useAuthStore } from '@/stores/authStore';
@@ -57,6 +58,14 @@ export default function SettingsScreen() {
         <Text muted>Members, invitations, join code and QR code.</Text>
         <Button label="Open Family" variant="secondary" onPress={() => router.push('/family')} />
       </Card>
+
+      {billingEnabled ? (
+        <Card>
+          <Text variant="heading">Subscription & billing</Text>
+          <Text muted>Your family room’s plan.</Text>
+          <Button label="Plan & billing" variant="secondary" onPress={() => router.push('/preferences/billing')} />
+        </Card>
+      ) : null}
 
       <Card>
         <Text variant="heading">Appearance</Text>

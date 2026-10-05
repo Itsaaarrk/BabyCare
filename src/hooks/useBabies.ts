@@ -25,6 +25,7 @@ export function useBabySync(): void {
       setRole: (roomId, role) => patchRoom(roomId, { role: role ?? undefined }),
       setBabies: (roomId, babies) => patchRoom(roomId, { babies }),
       setMembers: (roomId, members) => patchRoom(roomId, { members }),
+      setEntitlement: (roomId, entitlement) => patchRoom(roomId, { entitlement }),
       setInvite: (roomId, invite) => patchRoom(roomId, { invite }),
       roomUnavailable: removeRoom,
     });

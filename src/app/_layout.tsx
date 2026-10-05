@@ -75,6 +75,17 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
+            name="paywall"
+            options={{
+              headerShown: true,
+              title: 'BabyCare Plus',
+              headerStyle: { backgroundColor: colors.background },
+              headerTintColor: colors.text,
+              headerShadowVisible: false,
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          />
+          <Stack.Screen
             name="join"
             options={{
               headerShown: true,

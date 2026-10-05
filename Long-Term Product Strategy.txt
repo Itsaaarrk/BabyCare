@@ -1,0 +1,1367 @@
+# Child & Family Care Journal — Long-Term Product Strategy & Development Prompt
+
+## 1. Product Vision
+
+Build the application as a **Child & Family Care Journal** rather than a simple newborn/baby tracker.
+
+The application should begin by solving the immediate needs of parents with newborns and young babies, but its data model, navigation, UI, and feature architecture must allow the product to grow with the child from:
+
+**Expecting Parent → Newborn → Baby → Toddler → Preschool Child → Young Child**
+
+The application must NOT become obsolete when the child reaches 1 year old.
+
+The core product concept is:
+
+> **A private shared family space for tracking childcare, routines, milestones, memories, and important child information as the child grows.**
+
+The application should feel useful every day during the newborn stage, while gradually changing its recommended features as the child gets older.
+
+---
+
+# 2. Product Positioning
+
+Do NOT position the application as:
+
+> "A diaper and feeding tracker."
+
+Instead position it as:
+
+> **"A shared family journal that helps parents and caregivers track their child's care, routines, milestones, memories, and growth."**
+
+The newborn tracking features are the application's initial entry point, not the entire product.
+
+The product should provide three major value areas:
+
+### A. Care
+
+Track what happened today.
+
+Examples:
+
+* Feeding
+* Diapers
+* Sleep
+* Bath
+* Outdoor/sunlight time
+* Medicine
+* Pumping
+* Meals
+* Potty training
+* Activities
+
+### B. Growth
+
+Track how the child changes over time.
+
+Examples:
+
+* Height
+* Weight
+* Growth history
+* Developmental milestones
+* Vaccinations
+* Important health-related records
+* Potty-training progress
+
+### C. Memories
+
+Preserve important moments.
+
+Examples:
+
+* Photos
+* Milestone moments
+* Notes
+* First words
+* First steps
+* First birthday
+* Family memories
+* Important events
+
+The combination of **Care + Growth + Memories** is what should keep the application useful as the child grows.
+
+---
+
+# 3. Age-Based Experience
+
+The application must determine the child's current age from the child's date of birth.
+
+Do not hard-code the application around a newborn.
+
+Instead, implement an **Age Stage System**.
+
+Example stages:
+
+```text
+EXPECTING
+0–3 MONTHS
+3–6 MONTHS
+6–12 MONTHS
+1–2 YEARS
+2–3 YEARS
+3–5 YEARS
+5+ YEARS
+```
+
+The exact boundaries can be adjusted if the implementation requires it.
+
+The child's current stage should influence:
+
+* Dashboard recommendations
+* Suggested activities
+* Quick-log actions
+* Milestone suggestions
+* Analytics
+* Reminders
+* Educational/help content
+* Feature recommendations
+
+---
+
+# 4. Important UX Rule
+
+Do NOT remove old features when the child grows.
+
+For example:
+
+A child who is 14 months old may still need:
+
+* Sleep tracking
+* Meals
+* Bath tracking
+* Notes
+* Photos
+* Memories
+
+Therefore, the application should have:
+
+### Recommended
+
+Features recommended for the child's current age.
+
+### All Activities
+
+Access to all available activities.
+
+This prevents the age-stage system from becoming restrictive.
+
+---
+
+# 5. Newborn Experience
+
+For newborns, prioritize:
+
+### Quick Actions
+
+* Feeding
+* Diaper
+* Sleep
+* Bath
+* Pumping
+* Outdoor/sunlight
+* Medicine
+* Note
+* Photo
+
+The dashboard should make these actions extremely fast.
+
+Parents should be able to record an activity in only a few taps.
+
+---
+
+# 6. 3–6 Month Experience
+
+As the baby grows, introduce more emphasis on:
+
+* Feeding patterns
+* Sleep routines
+* Tummy time
+* Activity tracking
+* Growth
+* Milestones
+* Photos
+* Notes
+
+The dashboard should gradually recommend these features without removing newborn tracking.
+
+---
+
+# 7. 6–12 Month Experience
+
+Introduce features such as:
+
+### Solid Food
+
+Track:
+
+* Food
+* Date/time
+* Amount
+* Reaction
+* New food
+* Notes
+* Optional photo
+
+### Developmental Milestones
+
+Examples:
+
+* Sitting
+* Crawling
+* Pulling up
+* Standing
+* First words
+* Responding to sounds
+* Other configurable milestones
+
+### Growth
+
+Track:
+
+* Weight
+* Height
+* Head circumference where appropriate
+
+Provide simple historical charts.
+
+Do not present growth information as medical diagnosis.
+
+The application is a tracking/journaling tool, not a medical diagnostic system.
+
+---
+
+# 8. 1–2 Year Experience
+
+When the child reaches one year old, the application should transition naturally into a toddler-care experience.
+
+Prioritize:
+
+* Meals
+* Snacks
+* Sleep
+* Bath
+* Activities
+* Milestones
+* Photos
+* Memories
+* Growth
+* Vaccination records
+* Potty training preparation/tracking
+* Notes
+
+The dashboard should no longer feel like a "newborn tracker."
+
+Instead it should feel like:
+
+> "What happened with my child today?"
+
+---
+
+# 9. 2–3 Year Experience
+
+Introduce stronger support for:
+
+### Potty Training
+
+Track:
+
+* Attempt
+* Success
+* Accident
+* Time
+* Notes
+* Progress
+
+Provide simple progress analytics.
+
+### Routines
+
+Allow parents to create routines such as:
+
+```text
+Morning
+Breakfast
+Brush teeth
+Get dressed
+Daycare
+Lunch
+Nap
+Play
+Dinner
+Bath
+Bedtime
+```
+
+The system should allow custom routines.
+
+---
+
+# 10. 3+ Year Experience
+
+As the child grows, gradually shift the product toward:
+
+### Child Journal
+
+* Daily notes
+* Photos
+* Memories
+* Milestones
+* Activities
+* Growth
+* Routines
+* School/daycare information
+* Important dates
+* Achievements
+
+The application should continue to preserve all historical information.
+
+---
+
+# 11. Milestone System
+
+Create a reusable milestone system.
+
+Milestones should support:
+
+```text
+id
+childId
+category
+title
+description
+date
+ageAtMilestone
+photo
+notes
+createdBy
+createdAt
+```
+
+Examples:
+
+```text
+First smile
+First laugh
+First rollover
+First sit
+First crawl
+First stand
+First step
+First word
+First tooth
+First birthday
+First haircut
+First day of daycare
+First day of school
+```
+
+Do not limit the milestone system to predefined milestones.
+
+Allow users to create custom milestones.
+
+Example:
+
+> "First time visiting the beach"
+
+or
+
+> "First time meeting Grandma"
+
+---
+
+# 12. Memories System
+
+Create a dedicated Memories section.
+
+A memory may contain:
+
+* Title
+* Date
+* Photo
+* Description
+* Child
+* Created by
+* Tags
+* Optional location
+* Created timestamp
+
+Example:
+
+> **First Steps**
+>
+> March 15, 2027
+>
+> "Today she took three steps by herself!"
+
+The system should allow multiple photos per memory where appropriate.
+
+Memories should become one of the application's long-term retention features.
+
+---
+
+# 13. Photo Timeline
+
+Create a private family photo timeline.
+
+Photos can be associated with:
+
+* Activities
+* Milestones
+* Memories
+* Daily journal entries
+
+Users should be able to browse:
+
+```text
+2026
+ ├── October
+ ├── November
+ └── December
+
+2027
+ ├── January
+ ├── February
+ └── March
+```
+
+Photos must remain private to authorized family-room members.
+
+Store photos in Firebase Storage.
+
+Do not store large image binaries directly inside Realtime Database.
+
+---
+
+# 14. Growth Tracking
+
+Create a flexible growth tracking system.
+
+Track:
+
+* Weight
+* Height
+* Optional head circumference
+* Date
+* Notes
+
+Provide:
+
+* Historical list
+* Simple chart
+* Date filtering
+* Age-at-record display
+
+Example:
+
+```text
+Birth
+3.2 kg
+
+3 months
+5.7 kg
+
+6 months
+7.1 kg
+
+12 months
+9.0 kg
+```
+
+The system must not make medical claims or diagnoses.
+
+Use wording such as:
+
+> "Growth history"
+
+rather than:
+
+> "Medical assessment"
+
+---
+
+# 15. Vaccination / Important Health Records
+
+Create a simple record system for important child records.
+
+Examples:
+
+* Vaccination
+* Doctor visit
+* Prescription note
+* Allergy information
+* Important medical note
+
+For the MVP, keep this simple.
+
+Do not turn the application into a full electronic medical record system.
+
+The goal is personal/family organization.
+
+---
+
+# 16. Child Profile
+
+Each child should have a profile containing:
+
+```text
+id
+name
+nickname
+dateOfBirth
+gender (optional)
+profilePhoto
+birthDetails (optional)
+notes
+createdAt
+updatedAt
+```
+
+The application should calculate:
+
+```text
+Age
+Age in months
+Age in years/months
+Current age stage
+```
+
+Example:
+
+> **Emma**
+>
+> 14 months old
+>
+> Toddler Stage
+
+---
+
+# 17. Multiple Children
+
+The architecture must support multiple children.
+
+Example:
+
+```text
+Family Room
+
+├── Emma
+│   ├── Activities
+│   ├── Memories
+│   └── Growth
+│
+└── Liam
+    ├── Activities
+    ├── Memories
+    └── Growth
+```
+
+Users should be able to switch between children easily.
+
+All child-specific data must contain a `childId`.
+
+Never mix data between children.
+
+---
+
+# 18. Family Room
+
+The Family Room remains one of the application's primary differentiators.
+
+A Family Room should allow parents and trusted caregivers to collaborate.
+
+Example roles:
+
+### Owner
+
+Full control.
+
+### Parent
+
+Can manage children and activities.
+
+### Caregiver
+
+Can log activities and view relevant information.
+
+### Viewer
+
+Can view information but has limited editing rights.
+
+The exact permission model should be enforced using Firebase Security Rules.
+
+---
+
+# 19. Family Room Premium Model
+
+Premium access belongs to the **Family Room**, not an individual user.
+
+Example:
+
+```text
+Family Room
+      │
+      ├── Mom
+      ├── Dad
+      ├── Grandma
+      └── Nanny
+```
+
+If Mom purchases Premium:
+
+```text
+Family Room = Premium
+```
+
+All authorized members should receive the appropriate Premium benefits.
+
+A family member must NOT be able to purchase Premium and automatically gain access to another unrelated Family Room.
+
+---
+
+# 20. Dashboard Evolution
+
+The dashboard must be age-aware.
+
+### Newborn
+
+Show:
+
+```text
+Good morning!
+
+Quick Log
+
+Feeding
+Diaper
+Sleep
+Bath
+
+Today's Summary
+
+Feeds: 6
+Diapers: 7
+Sleep: 13h
+```
+
+### Toddler
+
+Show:
+
+```text
+Good morning!
+
+Today's Care
+
+Meals
+Sleep
+Activities
+Potty
+
+Today's Memories
+
+📷 2 memories
+
+Milestones
+
+⭐ 1 new milestone
+```
+
+The dashboard should evolve without requiring a completely different application.
+
+---
+
+# 21. Timeline
+
+The Timeline should remain a central feature throughout the child's life.
+
+Example:
+
+```text
+Today
+
+08:10
+Breakfast
+
+09:30
+Outdoor Play
+
+11:45
+Nap
+
+14:10
+Snack
+
+16:30
+Photo
+
+18:00
+Dinner
+```
+
+For newborns:
+
+```text
+08:10 Feeding
+09:00 Diaper
+10:15 Sleep
+12:00 Feeding
+13:00 Diaper
+```
+
+The timeline should adapt to the types of activities relevant to the child.
+
+---
+
+# 22. Analytics
+
+Analytics should evolve with the child's age.
+
+### Newborn analytics
+
+* Feeding frequency
+* Diaper frequency
+* Sleep duration
+* Bath frequency
+* Outdoor time
+
+### Baby analytics
+
+* Sleep patterns
+* Feeding patterns
+* Solid food introduction
+* Growth history
+
+### Toddler analytics
+
+* Sleep
+* Meals
+* Potty training
+* Activities
+* Routines
+
+### Long-term analytics
+
+* Activity history
+* Growth history
+* Milestones
+* Memories
+
+Users should be able to filter by:
+
+```text
+Today
+7 Days
+30 Days
+3 Months
+6 Months
+1 Year
+Custom Range
+```
+
+---
+
+# 23. "Recommended for Your Child" System
+
+Create a recommendation layer based on age stage.
+
+Example:
+
+```text
+Recommended for Emma
+
+⭐ Add a milestone
+📷 Save today's memory
+🥕 Track a new food
+🚽 Start potty training
+📏 Record growth
+```
+
+Recommendations must be informational/product guidance only.
+
+Do not present them as medical instructions.
+
+---
+
+# 24. Notification Strategy
+
+Notifications should also evolve with age.
+
+Examples:
+
+Newborn:
+
+> "Time to check today's feeding log."
+
+Toddler:
+
+> "Don't forget to record today's nap."
+
+Potty training:
+
+> "It's been 2 hours since the last potty attempt."
+
+Milestone:
+
+> "Emma has been 1 year old for 1 month."
+
+Memory:
+
+> "You haven't saved a memory this week."
+
+Users must be able to configure or disable notifications.
+
+Do not spam users.
+
+---
+
+# 25. Long-Term Retention Strategy
+
+The product must create reasons to return even when daily childcare logging becomes less important.
+
+Primary retention mechanisms:
+
+### 1. Family collaboration
+
+Parents and caregivers continue using the shared Family Room.
+
+### 2. Memories
+
+Users build a permanent private family history.
+
+### 3. Milestones
+
+Users record important moments.
+
+### 4. Growth history
+
+Users maintain a long-term record.
+
+### 5. Routines
+
+Parents can continue tracking daily routines.
+
+### 6. Child development journal
+
+The child gradually transitions from baby care to child journaling.
+
+### 7. Photos
+
+The app becomes a private chronological child album.
+
+---
+
+# 26. Monetization Strategy
+
+The application should support:
+
+### Free
+
+* 1 child
+* 1 Family Room
+* Core activities
+* Basic timeline
+* Basic dashboard
+* Limited photos
+* Basic memories
+* Ads
+
+### Plus Monthly
+
+Suggested:
+
+**₱129/month**
+
+### Plus Yearly
+
+Suggested:
+
+**₱999/year**
+
+### Lifetime
+
+Suggested:
+
+**₱1,999 one-time**
+
+Premium may include:
+
+* Multiple children
+* Advanced analytics
+* More photo/storage capacity
+* Advanced memories
+* PDF/export
+* Advanced reports
+* Custom dashboard
+* Advanced reminders
+* No advertisements
+* More customization
+* Long-term archive features
+
+Do not make the free version unusable.
+
+The free version should provide genuine value.
+
+---
+
+# 27. Critical Monetization Principle
+
+Do not build the business model around:
+
+> "Parents must pay to track diapers."
+
+Instead build the business around:
+
+> "Parents pay because this becomes their family's long-term private care and memory system."
+
+This distinction is important for retention and customer satisfaction.
+
+---
+
+# 28. Technical Architecture
+
+Use:
+
+### Frontend
+
+* React Native
+* Expo
+* TypeScript
+* Expo Router
+
+### Backend
+
+* Firebase Authentication
+* Firebase Realtime Database
+* Firebase Storage
+* Firebase Cloud Functions
+
+IMPORTANT:
+
+Use **Firebase Realtime Database, NOT Firestore**, unless the project requirements are explicitly changed later.
+
+### Suggested supporting libraries
+
+Evaluate and use only where justified:
+
+* React Native Gesture Handler
+* React Native Reanimated
+* React Hook Form
+* Zod
+* Zustand
+* TanStack Query where appropriate
+
+Do not add libraries unnecessarily.
+
+---
+
+# 29. Suggested Firebase Structure
+
+Design the database around long-term growth.
+
+Example:
+
+```text
+users/
+familyRooms/
+familyMembers/
+children/
+
+children/{childId}/
+    profile
+    activities/
+    milestones/
+    memories/
+    growth/
+    vaccinations/
+    routines/
+    notes/
+
+familyRooms/{familyRoomId}/
+    members/
+    children/
+    settings/
+    subscription/
+    usage/
+```
+
+All data must be scoped to the appropriate:
+
+```text
+familyRoomId
+childId
+```
+
+Never trust client-side filtering as the only security mechanism.
+
+---
+
+# 30. Security
+
+Firebase Security Rules must enforce:
+
+* Family-room membership
+* Child access
+* Role permissions
+* Ownership
+* Premium entitlement boundaries
+* Photo access
+* Data isolation
+
+A user must never be able to access another family's data by modifying:
+
+```text
+familyRoomId
+childId
+```
+
+in a request.
+
+Premium status must NOT be granted by the client.
+
+The client can request or display entitlement information, but authoritative entitlement state must be protected.
+
+---
+
+# 31. Offline Support
+
+The application should remain useful when internet connectivity is poor.
+
+Parents may be:
+
+* At home
+* Outside
+* Traveling
+* In areas with weak mobile data
+
+Important activity logs should be designed to tolerate temporary connectivity problems.
+
+Use Firebase's supported offline behavior appropriately.
+
+Do not build unnecessary custom synchronization if Firebase already handles the requirement.
+
+---
+
+# 32. Quick Logging
+
+Quick logging is extremely important.
+
+The user should be able to record common activities quickly.
+
+Example:
+
+```text
+Open App
+
+↓
+Quick Log
+
+↓
+Tap Feeding
+
+↓
+Start Timer
+```
+
+or:
+
+```text
+Open App
+
+↓
+Tap Diaper
+
+↓
+Poop + Pee
+
+↓
+Save
+```
+
+The application may optionally support:
+
+### Shake-to-log
+
+However, this must be optional.
+
+It must not be the primary logging mechanism because accidental activation is possible.
+
+Allow users to disable it.
+
+---
+
+# 33. UI Customization
+
+Allow users to customize:
+
+* Baby/child profile photo
+* Child nickname
+* Dashboard layout
+* Visible quick actions
+* Theme
+* Reminder preferences
+* Units where appropriate
+* Activity preferences
+
+Customization should not make the interface confusing.
+
+Maintain strong defaults.
+
+---
+
+# 34. Product Evolution Principle
+
+The architecture must follow:
+
+> **Stable core + evolving experience**
+
+Stable core:
+
+```text
+Family
+Child
+Activities
+Timeline
+Memories
+Milestones
+Photos
+Settings
+```
+
+Evolving experience:
+
+```text
+Newborn recommendations
+Baby recommendations
+Toddler recommendations
+Preschool recommendations
+```
+
+Do NOT create separate applications for each age.
+
+Do NOT duplicate the data model for each age.
+
+Use reusable activity and record types.
+
+---
+
+# 35. MVP Scope
+
+For the initial release, prioritize:
+
+### Must Have
+
+* Authentication
+* Family Room
+* Family member invitation/code/QR
+* Child profile
+* Multiple child-ready architecture
+* Feeding
+* Diaper
+* Sleep
+* Bath
+* Outdoor/sunlight
+* Notes
+* Photos
+* Timeline
+* Dashboard
+* Basic analytics
+* Milestones
+* Memories
+* Basic growth tracking
+* Age-stage detection
+* Basic notifications
+* Firebase Storage
+* Firebase Security Rules
+* Offline-friendly logging
+
+### Can Come Later
+
+* Solid food tracking
+* Potty training
+* Vaccination tracking
+* Advanced routines
+* PDF reports
+* Advanced analytics
+* Advanced photo albums
+* AI-assisted summaries
+* School/daycare features
+* Advanced customization
+
+---
+
+# 36. Important AI/Agent Instruction
+
+Before writing code:
+
+1. Inspect the existing project.
+2. Identify the current Expo version.
+3. Identify the current React Native version.
+4. Identify the Firebase configuration.
+5. Identify the current navigation architecture.
+6. Identify existing authentication implementation.
+7. Identify existing database models.
+8. Identify existing Firebase Security Rules.
+9. Identify existing storage configuration.
+10. Identify existing notification infrastructure.
+11. Identify existing UI components.
+12. Identify existing state management.
+
+Do not blindly replace existing architecture.
+
+Reuse existing patterns whenever they are sound.
+
+---
+
+# 37. Implementation Rules
+
+Follow:
+
+> Inspect → Plan → Implement → Test → Review
+
+For each major feature:
+
+### Step 1 — Inspect
+
+Understand the existing project.
+
+### Step 2 — Plan
+
+Describe:
+
+* Files to change
+* Data model
+* UI changes
+* Security changes
+* Testing requirements
+
+### Step 3 — Implement
+
+Make the smallest safe change.
+
+### Step 4 — Test
+
+Run:
+
+* TypeScript checks
+* Unit tests
+* Relevant integration tests
+* Firebase Rules tests where available
+
+### Step 5 — Review
+
+Check:
+
+* Security
+* Performance
+* Offline behavior
+* UX
+* Unintended side effects
+
+---
+
+# 38. Avoid Overengineering
+
+Do not build every future feature immediately.
+
+The application should be architecturally ready for:
+
+```text
+Newborn
+↓
+Baby
+↓
+Toddler
+↓
+Preschool
+```
+
+but implementation should remain MVP-focused.
+
+Build the foundations correctly now:
+
+```text
+Child
+Family Room
+Activity
+Timeline
+Memory
+Milestone
+Growth
+Photo
+```
+
+Then expand features later.
+
+---
+
+# 39. Acceptance Criteria
+
+The final product should satisfy these principles:
+
+### Product
+
+* The app is useful for newborns.
+* The app remains useful after 12 months.
+* The app can support toddlers.
+* The app can eventually support older children.
+* Historical data is never lost when the child ages.
+* The experience changes based on age without breaking existing functionality.
+
+### Technical
+
+* TypeScript.
+* React Native + Expo.
+* Firebase.
+* Realtime Database rather than Firestore.
+* Firebase Storage for photos.
+* Secure Firebase Rules.
+* Family-room data isolation.
+* Child-level data isolation.
+* Offline-friendly activity logging.
+
+### UX
+
+* Logging common activities takes only a few taps.
+* Dashboard is age-aware.
+* Timeline is easy to understand.
+* Memories are easy to create.
+* Photos are easy to attach.
+* Users can access all activities even when they are not age-recommended.
+
+### Business
+
+* Free version has meaningful value.
+* Premium provides long-term value.
+* Premium belongs to the Family Room.
+* Ads do not interfere with critical logging.
+* The product has a reason to remain installed after the newborn period.
+
+---
+
+# 40. Final Product Principle
+
+The most important product requirement is:
+
+> **Do not build an app that parents outgrow when their baby turns one. Build an app that grows with the child.**
+
+The application should start as:
+
+**"Help me manage my newborn."**
+
+Then evolve into:
+
+**"Help me understand and organize my baby's routines."**
+
+Then:
+
+**"Help me manage my toddler's routines and milestones."**
+
+Then:
+
+**"Help me preserve my child's growth and memories."**
+
+Ultimately:
+
+**"This is our family's private history of our child growing up."**
+
+Every major architectural and product decision should support this long-term vision.

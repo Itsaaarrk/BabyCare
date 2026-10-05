@@ -9,8 +9,10 @@ import { Card } from '@/components/ui/Card';
 import { Screen } from '@/components/ui/Screen';
 import { Text } from '@/components/ui/Text';
 import { MIN_TOUCH_TARGET, radius } from '@/constants/theme';
+import { useRoomPlan } from '@/hooks/useEntitlement';
 import { useRooms } from '@/hooks/useRooms';
 import { useTheme } from '@/hooks/useTheme';
+import { PLAN_NAME } from '@/lib/billing/config';
 import { toUserMessage } from '@/lib/errors';
 import { can, ROLE_LABELS } from '@/lib/permissions';
 import { deleteRoom, removeMember } from '@/services/rooms/roomService';
@@ -22,6 +24,7 @@ export default function FamilyScreen() {
   const { rooms, current, loading, showRoom } = useRooms();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const plan = useRoomPlan(current?.id);
 
   if (loading) {
     return (
@@ -98,6 +101,15 @@ export default function FamilyScreen() {
           {role ? ` · You are ${role === 'owner' ? 'the owner' : `a ${ROLE_LABELS[role].toLowerCase()}`}` : ''}
         </Text>
       </View>
+
+      <Card>
+        <Text variant="heading">{plan.isPlus ? PLAN_NAME : 'BabyCare Free'}</Text>
+        <Text muted>
+          {plan.isPlus
+            ? 'Premium is shared with all members of this family room.'
+            : 'The Free plan covers everyday tracking for this family room.'}
+        </Text>
+      </Card>
 
       {rooms.length > 1 ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>

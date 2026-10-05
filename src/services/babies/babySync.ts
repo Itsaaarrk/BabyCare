@@ -1,6 +1,7 @@
 import { onValue, ref, type Unsubscribe } from 'firebase/database';
 
 import { getFirebaseDatabase } from '@/lib/firebase';
+import { parseEntitlement, type RoomEntitlement } from '@/lib/billing/entitlement';
 import { can } from '@/lib/permissions';
 import type { BabyRecord, RoomInfo, RoomInvite, RoomMember, RoomRole } from '@/types/baby';
 
@@ -13,6 +14,8 @@ export interface RoomSink {
   setRole(roomId: string, role: RoomRole | null): void;
   setBabies(roomId: string, babies: Record<string, BabyRecord>): void;
   setMembers(roomId: string, members: RoomMember[]): void;
+  /** The room's plan; `null` when none is recorded (Free). */
+  setEntitlement(roomId: string, entitlement: RoomEntitlement | null): void;
   /** `null` when there is no active invitation, or the user can't see it. */
   setInvite(roomId: string, invite: RoomInvite | null): void;
   /** The room can't be read (removed, or the user was removed from it). */
@@ -129,6 +132,12 @@ export function subscribeToUserRooms(uid: string, sink: RoomSink): Unsubscribe {
       ),
       onValue(ref(db, `rooms/${roomId}/members`), (s) => sink.setMembers(roomId, parseMembers(s.val())), fail),
       onValue(ref(db, `rooms/${roomId}/babies`), (s) => sink.setBabies(roomId, parseBabies(s.val())), fail),
+      onValue(
+        ref(db, `rooms/${roomId}/entitlement`),
+        (s) => sink.setEntitlement(roomId, parseEntitlement(s.val())),
+        // A failure here must not drop the room; the plan just stays whatever it was (Free if unknown).
+        () => sink.setEntitlement(roomId, null),
+      ),
     ]);
   };
 

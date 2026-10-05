@@ -39,14 +39,7 @@ const activity = (user, over = {}) =>
 async function family() {
   const ana = await newUser('ana');
   const { roomId } = await ana.call('createRoom', { name: "Sofia's Family" });
-  const babyId = 'baby1';
-  await set(ref(ana.db, `rooms/${roomId}/babies/${babyId}`), {
-    name: 'Sofia',
-    birthDate: '2026-09-22',
-    createdBy: ana.uid,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  });
+  const { babyId } = await ana.call('addBaby', { roomId, baby: { name: 'Sofia', birthDate: '2026-09-22' } });
 
   const members = {};
   for (const role of ['parent', 'caregiver', 'viewer']) {
