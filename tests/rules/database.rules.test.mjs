@@ -316,10 +316,26 @@ describe('user settings', () => {
 describe('baby profiles', () => {
   const path = `rooms/${ROOM}/babies/${BABY}`;
 
-  it('lets the owner edit and add babies', async () => {
+  it('lets the owner edit and delete an existing baby, but not create one directly', async () => {
     await seedRoom();
     await assertSucceeds(update(ref(as('ana'), path), { name: 'Sofia M.', updatedAt: now + 1 }));
-    await assertSucceeds(set(ref(as('ana'), `rooms/${ROOM}/babies/baby2`), babyRecord('ana', { name: 'Liam' })));
+    // New babies come from the addBaby Cloud Function, which enforces the plan's limit.
+    await assertFails(set(ref(as('ana'), `rooms/${ROOM}/babies/baby2`), babyRecord('ana', { name: 'Liam' })));
+    await assertFails(update(ref(as('ana'), `rooms/${ROOM}/babies`), { baby3: babyRecord('ana', { name: 'Max' }) }));
+    await assertSucceeds(remove(ref(as('ana'), path)));
+  });
+
+  it('keeps the room plan and billing data closed to clients', async () => {
+    await seedRoom({ dad: 'parent' });
+    for (const uid of ['ana', 'dad']) {
+      const db = as(uid);
+      await assertFails(set(ref(db, `rooms/${ROOM}/entitlement`), { plan: 'lifetime', status: 'active', updatedAt: now }));
+      await assertFails(set(ref(db, `rooms/${ROOM}/entitlement/plan`), 'lifetime'));
+      await assertFails(set(ref(db, `billingPrivate/${ROOM}`), { purchaseToken: 'x' }));
+      await assertFails(get(ref(db, `billingPrivate/${ROOM}`)));
+      await assertFails(set(ref(db, 'purchaseTokens/x'), { roomId: ROOM }));
+      await assertFails(set(ref(db, `roomBilling/${ROOM}`), { billingOwnerId: uid, plan: 'lifetime' }));
+    }
   });
 
   for (const role of ['parent', 'caregiver', 'viewer']) {

@@ -25,6 +25,10 @@ const SYMBOLS = {
   note: { ios: 'note.text', android: 'edit_note', web: 'edit_note' },
   photo: { ios: 'camera.fill', android: 'photo_camera', web: 'photo_camera' },
   baby: { ios: 'face.smiling', android: 'child_care', web: 'child_care' },
+  lock: { ios: 'lock.fill', android: 'lock', web: 'lock' },
+  star: { ios: 'star.fill', android: 'star', web: 'star' },
+  diamond: { ios: 'diamond.fill', android: 'diamond', web: 'diamond' },
+  check: { ios: 'checkmark', android: 'check', web: 'check' },
 } as const satisfies Record<string, SymbolName>;
 
 export type IconName = keyof typeof SYMBOLS;

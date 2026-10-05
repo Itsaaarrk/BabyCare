@@ -70,15 +70,8 @@ before(async () => {
 async function setup() {
   const ana = await newUser('ana');
   const { roomId, invite } = await ana.call('createRoom', { name: "Sofia's Family" });
-  const babyId = 'baby1';
-  await update(ref(ana.db, `rooms/${roomId}/babies/${babyId}`), {
-    name: 'Sofia',
-    birthDate: '2026-09-22',
-    createdBy: ana.uid,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  });
-  return { ana, roomId, invite };
+  const { babyId } = await ana.call('addBaby', { roomId, baby: { name: 'Sofia', birthDate: '2026-09-22' } });
+  return { ana, roomId, invite, babyId };
 }
 
 describe('createRoom', () => {
@@ -125,12 +118,12 @@ describe('joining', () => {
   });
 
   it('adds the member with the invite’s role and gives them access', async () => {
-    const { ana, roomId, invite } = await setup();
+    const { ana, roomId, invite, babyId } = await setup();
     const grandma = await newUser('grandma');
     await readDenied(grandma, `rooms/${roomId}/babies`);
 
     assert.deepEqual(await grandma.call('joinRoom', { code: invite.code }), { roomId, role: 'caregiver' });
-    assert.equal((await grandma.read(`rooms/${roomId}/babies/baby1`)).name, 'Sofia');
+    assert.equal((await grandma.read(`rooms/${roomId}/babies/${babyId}`)).name, 'Sofia');
     assert.equal((await ana.read(`rooms/${roomId}/members/${grandma.uid}`)).displayName, 'grandma');
     assert.deepEqual(await grandma.claims(), { [roomId]: 'caregiver' });
     // Caregivers can't see the invite code.

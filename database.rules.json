@@ -81,6 +81,19 @@
       }
     },
 
+    // Billing details for the person who paid for a room's plan. Written only by Cloud Functions.
+    // Deliberately not under rooms/: everything under a room is readable by every member.
+    "roomBilling": {
+      "$roomId": {
+        ".read": "auth != null && data.child('billingOwnerId').val() === auth.uid"
+      }
+    },
+
+    // Purchase tokens and verification data, plus the token -> room index that stops one purchase
+    // from unlocking two rooms. No client access at all (no rules means closed).
+    "billingPrivate": {},
+    "purchaseTokens": {},
+
     "rooms": {
       "$roomId": {
         ".read": "auth != null && root.child('rooms').child($roomId).child('members').child(auth.uid).exists()",
@@ -112,9 +125,18 @@
         // Members are readable by every member (inherited) and writable by no client.
         "members": {},
 
+        // The room's plan (plan, status, expiresAt). Members may read it (inherited from the room);
+        // no client may write it. Only Cloud Functions do, after verifying a purchase. It holds
+        // nothing sensitive: purchase tokens and owner details live in server-only nodes below.
+        "entitlement": {
+          ".write": false
+        },
+
         "babies": {
           "$babyId": {
-            ".write": "auth != null && root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'owner'",
+            // Owners may edit and delete existing babies. Creating one goes through the addBaby
+            // Cloud Function, because rules can't count how many babies a room already has.
+            ".write": "auth != null && data.exists() && root.child('rooms').child($roomId).child('members').child(auth.uid).child('role').val() === 'owner'",
             ".validate": "newData.hasChildren(['name', 'birthDate', 'createdBy', 'createdAt', 'updatedAt'])",
             "name": {
               ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60"

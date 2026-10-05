@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import type { RoomEntitlement } from '@/lib/billing/entitlement';
 import type { BabyRecord, RoomInfo, RoomInvite, RoomMember, RoomRole } from '@/types/baby';
 
 export interface RoomState {
@@ -12,6 +13,8 @@ export interface RoomState {
   invite?: RoomInvite | null;
   /** `undefined` until the first snapshot arrives, so loading is distinguishable from empty. */
   babies?: Record<string, BabyRecord>;
+  /** The room's plan. `null` means none recorded, which is the Free plan. */
+  entitlement?: RoomEntitlement | null;
 }
 
 export interface SelectedBaby {

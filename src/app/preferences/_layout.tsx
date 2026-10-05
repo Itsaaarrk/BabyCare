@@ -17,6 +17,7 @@ export default function PreferencesLayout() {
       <Stack.Screen name="quick-actions" options={{ title: 'Quick logging' }} />
       <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
       <Stack.Screen name="time-zone" options={{ title: 'Time zone' }} />
+      <Stack.Screen name="billing" options={{ title: 'Subscription & billing' }} />
     </Stack>
   );
 }

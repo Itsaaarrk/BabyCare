@@ -6,6 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Alert, Pressable, View } from 'react-native';
 
 import { BabyAvatar } from '@/components/baby/BabyAvatar';
+import { LockedFeature } from '@/components/billing/LockedFeature';
 import { Button } from '@/components/ui/Button';
 import { DateField } from '@/components/ui/DateField';
 import { Screen } from '@/components/ui/Screen';
@@ -14,7 +15,9 @@ import { TextField } from '@/components/ui/TextField';
 import { MIN_TOUCH_TARGET } from '@/constants/theme';
 import { babyFormSchema, type BabyFormValues } from '@/features/babies/schemas';
 import type { BabyEntry } from '@/hooks/useBabies';
+import { useRoomPlan } from '@/hooks/useEntitlement';
 import { useTheme } from '@/hooks/useTheme';
+import { PLAN_NAME, PLUS_LIMITS } from '@/lib/billing/config';
 import { toDateString } from '@/lib/date/age';
 import { errorDetails, logHandled, toUserMessage } from '@/lib/errors';
 import {
@@ -49,6 +52,8 @@ export function BabyEditor({ baby }: Props) {
   const user = useAuthStore((s) => s.user);
   const rooms = useBabyStore((s) => s.rooms);
   const select = useBabyStore((s) => s.select);
+  const ownedRoomId = Object.entries(rooms).find(([, room]) => room.role === 'owner')?.[0];
+  const plan = useRoomPlan(ownedRoomId);
 
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -102,9 +107,8 @@ export function BabyEditor({ baby }: Props) {
           await updateBaby(baby.roomId, baby.id, values);
           saved.current = { roomId: baby.roomId, babyId: baby.id };
         } else {
-          const ownedRoomId = Object.entries(rooms).find(([, room]) => room.role === 'owner')?.[0];
           saved.current = ownedRoomId
-            ? { roomId: ownedRoomId, babyId: await addBaby(user, ownedRoomId, values) }
+            ? { roomId: ownedRoomId, babyId: await addBaby(ownedRoomId, values) }
             : await createBabyWithRoom(user, values);
         }
       }
@@ -167,6 +171,20 @@ export function BabyEditor({ baby }: Props) {
       ],
     );
   };
+
+  // A room that is full can't take another baby. Say so up front instead of failing on save. Once a
+  // baby has been saved here (retrying a photo, say) the form must stay.
+  if (!baby && ownedRoomId && !plan.canAddBaby && !saved.current) {
+    return (
+      <Screen topInset={false}>
+        <LockedFeature
+          title="More babies"
+          description={`Your plan includes ${plan.limits.maxBabies} ${plan.limits.maxBabies === 1 ? 'baby' : 'babies'}. ${PLAN_NAME} lets a family room track up to ${PLUS_LIMITS.maxBabies}.`}
+        />
+        <Button label="Back" variant="secondary" onPress={() => router.back()} />
+      </Screen>
+    );
+  }
 
   const busy = isSubmitting || deleting;
   const photoUploadFailed = photoError !== null && saved.current !== null;

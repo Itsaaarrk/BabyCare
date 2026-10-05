@@ -5,6 +5,7 @@ import { getStorage } from 'firebase-admin/storage';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { HttpsError, onCall, type CallableRequest } from 'firebase-functions/v2/https';
 
+import { maxBabiesFor, maxOwnedRoomsFor, parseBabyInput, parseEntitlement } from './billing.js';
 import {
   INVITE_TTL_MS,
   JOIN_ATTEMPT_WINDOW_MS,
@@ -50,6 +51,8 @@ type Reason =
   | 'not-allowed'
   | 'invalid-input'
   | 'room-limit'
+  | 'owned-room-limit'
+  | 'baby-limit'
   | 'not-found';
 
 const fail = (
@@ -92,6 +95,11 @@ async function requireRole(roomId: string, uid: string, allowed: readonly Role[]
   // Same answer for "no such room" and "not your room" so rooms can't be probed.
   if (!role || !allowed.includes(role)) return fail('permission-denied', 'not-allowed', 'Not allowed.');
   return role;
+}
+
+/** The room's plan as written by the server; null means Free. */
+async function getEntitlement(roomId: string) {
+  return parseEntitlement((await db.ref(`rooms/${roomId}/entitlement`).get()).val());
 }
 
 /**
@@ -202,6 +210,17 @@ export const createRoom = onCall(async (request) => {
   const existing = Object.keys(((await db.ref(`userRooms/${uid}`).get()).val() as object | null) ?? {});
   if (existing.length >= MAX_ROOMS_PER_USER) fail('resource-exhausted', 'room-limit', 'Room limit reached.');
 
+  // How many rooms this person owns decides whether another is allowed. Their own plan can't be
+  // read from a room they don't have yet, so the limit is the Free one unless one of their rooms is Plus.
+  const roles = await Promise.all(existing.map((roomId) => getRole(roomId, uid)));
+  const ownedRoomIds = existing.filter((_, i) => roles[i] === 'owner');
+  const now0 = Date.now();
+  const entitlements = await Promise.all(ownedRoomIds.map((roomId) => getEntitlement(roomId)));
+  const allowed = Math.max(maxOwnedRoomsFor(null, now0), ...entitlements.map((e) => maxOwnedRoomsFor(e, now0)));
+  if (ownedRoomIds.length >= allowed) {
+    fail('resource-exhausted', 'owned-room-limit', 'You already have a family room.');
+  }
+
   const roomId = db.ref('rooms').push().key as string;
   const ownerName = await displayNameOf(uid);
   const now = Date.now();
@@ -213,6 +232,39 @@ export const createRoom = onCall(async (request) => {
   const invite = await issueInvite(roomId, 'caregiver', uid);
   await syncClaims(uid);
   return { roomId, invite };
+});
+
+/**
+ * Adds a baby to a room the caller owns, within the room's plan. Clients can't create babies
+ * directly (see the database rules) because the rules can't count how many already exist.
+ * Existing babies are never touched: a room that lapsed back to Free keeps all of them and simply
+ * can't add more.
+ */
+export const addBaby = onCall(async (request) => {
+  const uid = requireUid(request);
+  const roomId = requireId(request.data?.roomId, 'room');
+  const now = Date.now();
+  const input = parseBabyInput(request.data?.baby, now);
+  if (!input) return fail('invalid-argument', 'invalid-input', 'Invalid baby details.');
+
+  await requireRole(roomId, uid, ['owner']);
+
+  const limit = maxBabiesFor(await getEntitlement(roomId), now);
+  // Only the count matters, but the database returns each baby with its activities. Reading at
+  // most `limit` babies keeps that bounded.
+  const snapshot = await db.ref(`rooms/${roomId}/babies`).orderByKey().limitToFirst(limit).get();
+  if (snapshot.numChildren() >= limit) {
+    return fail('resource-exhausted', 'baby-limit', 'This plan has reached its baby limit.');
+  }
+
+  const babyId = db.ref(`rooms/${roomId}/babies`).push().key as string;
+  await db.ref(`rooms/${roomId}/babies/${babyId}`).set({
+    ...input,
+    createdBy: uid,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return { babyId };
 });
 
 export const regenerateInvite = onCall(async (request) => {

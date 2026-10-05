@@ -12,6 +12,8 @@ const REASON_MESSAGES: Record<string, string> = {
   'too-many-attempts': 'Too many attempts. Please wait a while and try again.',
   'room-full': 'This family room is full.',
   'room-limit': "You've reached the limit of family rooms.",
+  'owned-room-limit': 'You already have a family room.',
+  'baby-limit': 'This family room has reached its limit for babies.',
   'not-allowed': "You don't have permission to do that.",
   'not-found': "We couldn't find that. It may have been removed.",
 };

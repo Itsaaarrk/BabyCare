@@ -59,6 +59,28 @@ device and gives no medical advice.
 - **Reminders** are scheduled on the device from synced data (`src/lib/reminders.ts`). The feeding
   reminder moves when the app syncs a new feed; there is no server push yet.
 
+## Plans and limits
+
+Plans belong to the family room, not to a person. The room's plan is `rooms/{roomId}/entitlement`
+(readable by members, writable only by Cloud Functions); nothing the app can do changes it.
+
+- **Free:** 1 baby and 1 owned room. **BabyCare Plus** (Monthly, Yearly or Lifetime, all the same):
+  up to 5 babies. Limits and prices live in `src/lib/billing/config.ts`; the server's copy of the rules
+  is `functions/src/billing.ts`, and `src/lib/billing/parity.test.ts` fails if the two disagree.
+- New babies are created by the `addBaby` Cloud Function, which applies the limit. Existing babies
+  are never removed or hidden if a plan ends; the room just can't add more.
+- Plus is decided from the dates as well as the status, so a stale record can't grant access forever.
+- There is no purchase flow yet. To try Plus on a room, use the developer-only script (it needs your
+  Firebase CLI login, or the local emulator):
+
+  ```bash
+  node scripts/grant-plan.mjs <roomId> plus_yearly --days 365 --project <firebase-project-id>
+  node scripts/grant-plan.mjs <roomId> free --project <firebase-project-id>   # back to Free
+  ```
+
+- Upgrade screens show in development builds only. Set `EXPO_PUBLIC_BILLING_ENABLED=true` to show
+  them in a release build. The paywall can't take payment until Google Play billing is added.
+
 ## Known limits
 
 - Conflicts are last-write-wins. A queued edit that is replayed after someone else changed the

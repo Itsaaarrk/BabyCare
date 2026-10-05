@@ -1,5 +1,6 @@
 import { httpsCallable } from 'firebase/functions';
 
+import type { BabyFormValues } from '@/features/babies/schemas';
 import { getFirebaseFunctions } from '@/lib/firebase';
 import { refreshClaims } from '@/services/auth/authService';
 import type { AssignableRole } from '@/lib/permissions';
@@ -35,6 +36,24 @@ export async function createRoom(name: string): Promise<{ roomId: string; invite
   const result = await call<{ roomId: string; invite: RoomInvite }>('createRoom', { name });
   await refreshClaims();
   return result;
+}
+
+/** Adds a baby through the server, which applies the room's plan limit. */
+export async function addBabyToRoom(roomId: string, baby: BabyFormValues): Promise<string> {
+  const result = await call<{ babyId: string }>('addBaby', { roomId, baby: toServerBaby(baby) });
+  return result.babyId;
+}
+
+/** Empty optional fields are left out; the server stores only what was filled in. */
+function toServerBaby(values: BabyFormValues) {
+  return {
+    name: values.name,
+    birthDate: values.birthDate,
+    nickname: values.nickname || undefined,
+    birthTime: values.birthTime || undefined,
+    gender: values.gender,
+    notes: values.notes || undefined,
+  };
 }
 
 export const previewRoom = (code: string) => call<RoomPreview>('previewRoom', { code });
