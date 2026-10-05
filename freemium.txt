@@ -1,0 +1,1740 @@
+# BabyCare — Monetization, Subscription & Google Play Billing
+
+## Development Prompt
+
+You are the lead mobile engineer responsible for implementing the monetization and premium entitlement system for the BabyCare mobile application.
+
+The application is a React Native + Expo + TypeScript application using Firebase Authentication, Firebase Realtime Database, Firebase Storage, and Firebase Cloud Functions.
+
+The application is a family-oriented baby care tracker where multiple caregivers can share a Family Room and record activities such as feeding, diapers, sleep, bath, outdoor time, notes, and photos.
+
+The goal of this task is to implement a production-ready monetization system for Google Play.
+
+---
+
+# 1. BUSINESS MODEL
+
+BabyCare will use a **Freemium + Subscription + Lifetime Purchase** model.
+
+The plans are:
+
+| Plan         |           Price | Purpose                      |
+| ------------ | --------------: | ---------------------------- |
+| Free         |              ₱0 | User acquisition             |
+| Plus Monthly |      ₱129/month | Flexible premium             |
+| Plus Yearly  |       ₱999/year | Main paid plan               |
+| Lifetime     | ₱1,999 one time | Subscription-resistant users |
+
+The pricing must be configurable and must NOT be hardcoded throughout the application.
+
+Create a centralized pricing/product configuration.
+
+---
+
+# 2. IMPORTANT BILLING PRINCIPLE
+
+The premium entitlement belongs to the **Family Room**, not individually to every family member.
+
+Example:
+
+```text
+Family Room
+"Sofia's Family"
+
+Plan:
+PLUS YEARLY
+
+Billing owner:
+Mom
+
+Members:
+Mom
+Dad
+Grandma
+Nanny
+```
+
+All authorized members of that Family Room should receive the Premium functionality associated with that room.
+
+Do NOT require every family member to purchase their own subscription.
+
+This is a core product requirement.
+
+---
+
+# 3. FREE PLAN
+
+Every authenticated user should be able to use BabyCare without paying.
+
+The Free plan should include the core baby-tracking functionality.
+
+## Free Features
+
+### Baby
+
+* 1 baby
+* Baby profile
+* Baby photo
+* Baby name
+* Birth date
+* Basic profile information
+
+### Family
+
+* 1 Family Room
+* Basic family sharing
+* Family member invitations
+* QR code joining
+* Join code
+
+### Activity Tracking
+
+* Feeding
+* Diaper
+* Sleep
+* Bath
+* Outdoor/sunlight
+* Notes
+
+### Timeline
+
+* Activity timeline
+* Activity details
+* Who logged the activity
+* Basic editing
+
+### Dashboard
+
+* Today's activity summary
+* Basic statistics
+* Quick logging
+
+### Analytics
+
+* Today
+* Yesterday
+* Last 7 days
+
+### Photos
+
+Include a limited amount of photo storage.
+
+The exact free storage allowance must be configurable.
+
+Suggested initial value:
+
+**500 MB**
+
+### Ads
+
+Free users may see advertisements.
+
+Ads must be non-intrusive.
+
+---
+
+# 4. PLUS MONTHLY
+
+Product:
+
+**Plus Monthly**
+
+Price:
+
+**₱129/month**
+
+Purpose:
+
+Provide flexible premium access for users who do not want to commit to an annual plan.
+
+Premium features should include:
+
+* Everything in Free
+* Multiple babies
+* Unlimited activity history
+* Advanced analytics
+* 30-day analytics
+* 90-day analytics
+* 1-year analytics
+* Custom date-range analytics
+* Advanced reminders
+* Custom dashboard
+* Custom themes
+* Increased photo storage
+* PDF reports
+* Data export
+* No advertisements
+* Premium family-room features
+
+Subscription renews according to Google Play subscription rules.
+
+Do not implement your own recurring billing logic.
+
+Google Play should be the billing authority for recurring subscriptions.
+
+---
+
+# 5. PLUS YEARLY
+
+Product:
+
+**Plus Yearly**
+
+Price:
+
+**₱999/year**
+
+This should be the primary recommended paid plan.
+
+It includes everything in Plus Monthly.
+
+The UI should visually communicate that this is the recommended/best-value plan.
+
+Example:
+
+> ⭐ Best Value
+> Plus Yearly
+> ₱999/year
+> Equivalent to ₱83.25/month
+
+Do not misrepresent the savings.
+
+The comparison should be mathematically correct.
+
+Compared with ₱129/month:
+
+₱129 × 12 = ₱1,548
+
+Therefore:
+
+₱999/year saves ₱549 compared with twelve monthly payments.
+
+Savings percentage:
+
+approximately 35.5%.
+
+Display this only if desired and ensure calculations remain accurate if pricing changes.
+
+---
+
+# 6. LIFETIME PLAN
+
+Product:
+
+**Lifetime**
+
+Price:
+
+**₱1,999 one time**
+
+This is a one-time Google Play purchase.
+
+It should permanently unlock the Premium feature set for the purchasing user's Family Room.
+
+There is:
+
+* No recurring charge
+* No renewal
+* No subscription expiration
+
+However, do NOT promise unlimited cloud infrastructure.
+
+Lifetime access means:
+
+> Permanent access to the application's Lifetime Premium feature entitlement.
+
+It does not automatically mean unlimited storage.
+
+Photo/storage limits must remain subject to the defined storage allowance and fair-use policies.
+
+---
+
+# 7. PRODUCT IDS
+
+Do not hardcode Google Play product IDs throughout the application.
+
+Create centralized product identifiers.
+
+Example:
+
+```text
+babycare_plus_monthly
+babycare_plus_yearly
+babycare_lifetime
+```
+
+If Google Play requires a different product/subscription structure, adapt the identifiers accordingly.
+
+The product IDs must be stored in one configuration module.
+
+Example:
+
+```typescript
+export const BILLING_PRODUCTS = {
+  plusMonthly: "babycare_plus_monthly",
+  plusYearly: "babycare_plus_yearly",
+  lifetime: "babycare_lifetime",
+} as const;
+```
+
+Do not scatter strings throughout components.
+
+---
+
+# 8. ENTITLEMENT MODEL
+
+Create a clear entitlement model.
+
+Possible states:
+
+```typescript
+type Plan =
+  | "free"
+  | "plus_monthly"
+  | "plus_yearly"
+  | "lifetime";
+```
+
+The system should also track subscription state.
+
+Example:
+
+```typescript
+type SubscriptionStatus =
+  | "none"
+  | "active"
+  | "grace_period"
+  | "paused"
+  | "cancelled"
+  | "expired";
+```
+
+Lifetime purchases should not use subscription expiration.
+
+---
+
+# 9. FAMILY ROOM ENTITLEMENT
+
+The premium state should be associated with the Family Room.
+
+Suggested structure:
+
+```text
+/rooms/{roomId}
+
+/rooms/{roomId}/billing
+```
+
+Example:
+
+```json
+{
+  "plan": "plus_yearly",
+  "status": "active",
+  "billingOwnerId": "user123",
+  "productId": "babycare_plus_yearly",
+  "purchaseToken": "...",
+  "startedAt": 123456789,
+  "expiresAt": 126789000
+}
+```
+
+For Lifetime:
+
+```json
+{
+  "plan": "lifetime",
+  "status": "active",
+  "billingOwnerId": "user123",
+  "productId": "babycare_lifetime",
+  "startedAt": 123456789,
+  "expiresAt": null
+}
+```
+
+Do not expose sensitive purchase information unnecessarily to regular family members.
+
+---
+
+# 10. BILLING OWNER
+
+The person who purchases Premium becomes the billing owner.
+
+Example:
+
+```text
+Family Room:
+Sofia's Family
+
+Billing Owner:
+Mom
+
+Plan:
+Plus Yearly
+```
+
+The billing owner may:
+
+* View billing status
+* View current plan
+* Manage subscription through Google Play
+* Restore purchases
+
+Other family members can see:
+
+> This family room has BabyCare Plus.
+
+They should not see unnecessary billing/private purchase details.
+
+---
+
+# 11. GOOGLE PLAY BILLING
+
+Implement Google Play billing using a properly maintained React Native/Expo-compatible billing solution.
+
+Before implementation:
+
+1. Inspect the existing Expo SDK.
+2. Determine whether the project uses Expo Go or a development/production native build.
+3. Select a billing library compatible with the project's Expo architecture.
+4. Do not assume Google Play Billing can be fully implemented inside Expo Go.
+5. Use a development build/EAS build when native billing functionality requires it.
+
+Do not create fake purchase flows.
+
+Do not simply set:
+
+```typescript
+isPremium = true;
+```
+
+after pressing a button.
+
+The application must use real Google Play purchase verification.
+
+---
+
+# 12. PURCHASE FLOW
+
+When a user selects a paid plan:
+
+1. Display the selected plan.
+2. Display the price obtained from Google Play.
+3. Explain the purchase.
+4. Start the Google Play purchase flow.
+5. Wait for purchase result.
+6. Verify the purchase.
+7. Update the Firebase entitlement.
+8. Refresh the application state.
+9. Unlock Premium features.
+10. Complete/acknowledge the transaction according to Google Play requirements.
+
+Example:
+
+```text
+Upgrade to BabyCare Plus
+
+⭐ Best Value
+
+₱999/year
+
+✓ No ads
+✓ Advanced analytics
+✓ More photo storage
+✓ Multiple babies
+✓ Advanced reminders
+✓ PDF reports
+
+[ Continue ]
+```
+
+Never claim that payment succeeded before the purchase has been verified.
+
+---
+
+# 13. PURCHASE VERIFICATION
+
+Purchase verification is a critical security requirement.
+
+Do not trust the mobile client alone.
+
+The recommended architecture is:
+
+```text
+Mobile App
+    │
+    │ Google Play purchase
+    ▼
+Google Play
+    │
+    ▼
+Purchase information
+    │
+    ▼
+Firebase Cloud Function
+    │
+    ▼
+Verify purchase
+    │
+    ▼
+Update Family Room entitlement
+    │
+    ▼
+Firebase Realtime Database
+```
+
+The server-side verification mechanism should be implemented according to the current Google Play Billing requirements.
+
+Never store Google Play service-account credentials inside the mobile application.
+
+Never place private Google API credentials in the React Native bundle.
+
+---
+
+# 14. PURCHASE TOKEN SECURITY
+
+Purchase tokens must be treated as sensitive billing information.
+
+Do not expose purchase tokens to normal family members.
+
+Do not place purchase tokens in logs.
+
+Do not send purchase tokens unnecessarily between unrelated services.
+
+Do not store service account credentials in:
+
+* Git
+* JavaScript source
+* Expo configuration exposed to the client
+* Firebase client configuration
+
+Use secure server-side configuration/secrets.
+
+---
+
+# 15. RESTORE PURCHASES
+
+The application must provide:
+
+> Restore Purchases
+
+in Settings.
+
+Example:
+
+```text
+Settings
+
+Subscription & Billing
+
+BabyCare Plus
+Yearly
+
+[ Restore Purchases ]
+[ Manage Subscription ]
+```
+
+A user who:
+
+* reinstalls the application
+* changes phones
+* clears app data
+* logs back into the same account
+
+should be able to restore their entitlement where Google Play permits it.
+
+---
+
+# 16. SUBSCRIPTION CANCELLATION
+
+Do not implement cancellation inside the app as a fake state change.
+
+Provide:
+
+> Manage Subscription
+
+which takes the user to the appropriate Google Play subscription management flow.
+
+The app should correctly reflect the subscription status after cancellation.
+
+If a subscription is cancelled but remains active until its expiration date:
+
+```text
+Plus Yearly
+
+Cancelled
+
+Active until:
+October 5, 2027
+
+You will not be charged again.
+```
+
+Premium should remain available until the actual entitlement expires.
+
+Do not immediately remove Premium solely because the user cancelled auto-renewal.
+
+---
+
+# 17. EXPIRED SUBSCRIPTION
+
+When a subscription actually expires:
+
+* Remove Premium entitlement
+* Return the room to Free
+* Preserve existing user data
+* Preserve existing activity history
+* Preserve family members
+* Do not delete baby data
+
+The user should never lose historical records simply because Premium expired.
+
+---
+
+# 18. LIFETIME PRIORITY
+
+If a Family Room has both:
+
+* an active subscription
+* a Lifetime purchase
+
+Lifetime should take precedence.
+
+Example:
+
+```text
+Subscription:
+Plus Yearly
+
+Lifetime:
+Purchased
+
+Effective entitlement:
+Lifetime
+```
+
+Do not downgrade a Lifetime customer because a subscription expires.
+
+---
+
+# 19. MULTIPLE PURCHASE SCENARIOS
+
+Handle these cases:
+
+### User purchases Monthly
+
+Room becomes Plus.
+
+### User upgrades to Yearly
+
+Room becomes Plus Yearly according to Google Play's subscription rules.
+
+### User purchases Lifetime
+
+Room becomes Lifetime.
+
+### User reinstalls app
+
+Entitlement can be restored.
+
+### User changes device
+
+Entitlement can be restored when using the appropriate Google Play account and application account.
+
+### Subscription expires
+
+Room returns to Free unless another valid entitlement exists.
+
+### Billing failure
+
+Follow the current Google Play subscription lifecycle.
+
+Do not immediately delete premium data.
+
+---
+
+# 20. PLAN FEATURE MATRIX
+
+Create a centralized feature entitlement system.
+
+Example:
+
+```typescript
+type PremiumFeature =
+  | "multiple_babies"
+  | "unlimited_history"
+  | "advanced_analytics"
+  | "advanced_reminders"
+  | "custom_dashboard"
+  | "custom_themes"
+  | "pdf_reports"
+  | "data_export"
+  | "premium_storage"
+  | "ad_free";
+```
+
+Create a single entitlement service:
+
+```typescript
+hasFeature(feature)
+```
+
+Example:
+
+```typescript
+if (entitlements.hasFeature("advanced_analytics")) {
+  // Show advanced analytics
+}
+```
+
+Do NOT scatter checks like:
+
+```typescript
+if (plan === "plus_yearly")
+```
+
+throughout the application.
+
+A user with Plus Monthly and a user with Plus Yearly should have the same Premium feature access.
+
+---
+
+# 21. FREE LIMITS
+
+Create centralized configurable limits.
+
+Example:
+
+```typescript
+const FREE_LIMITS = {
+  maxBabies: 1,
+  maxPhotoStorageBytes: 500 * 1024 * 1024,
+  analyticsHistoryDays: 7,
+};
+```
+
+Premium:
+
+```typescript
+const PLUS_LIMITS = {
+  maxBabies: 5,
+  analyticsHistoryDays: 365,
+};
+```
+
+Avoid hardcoding these limits in UI components.
+
+---
+
+# 22. STORAGE MANAGEMENT
+
+The Free plan should have limited storage.
+
+Suggested:
+
+### Free
+
+500 MB
+
+### Plus
+
+5 GB
+
+### Lifetime
+
+5 GB initially
+
+These values must be configurable.
+
+If the user reaches the storage limit:
+
+Display:
+
+> You've reached your photo storage limit.
+
+Options:
+
+> Upgrade to Plus
+
+or:
+
+> Manage Photos
+
+Do not silently fail uploads.
+
+---
+
+# 23. IMPORTANT LIFETIME STORAGE RULE
+
+Lifetime users must not automatically receive unlimited storage.
+
+The Lifetime plan provides permanent access to Premium features but storage remains subject to the defined storage allowance.
+
+This prevents uncontrolled infrastructure costs.
+
+---
+
+# 24. ADS
+
+Free users may see ads.
+
+Premium users:
+
+**No ads.**
+
+The application should have an abstraction around advertising so the ad provider can be changed later.
+
+Example:
+
+```typescript
+AdService.showBanner()
+AdService.hideAds()
+```
+
+Do not place ad-provider-specific code throughout the application.
+
+---
+
+# 25. AD PLACEMENT
+
+Ads may appear on:
+
+* Home dashboard
+* Analytics
+* Timeline
+* Non-critical informational screens
+
+Do NOT interrupt:
+
+* Diaper logging
+* Feeding logging
+* Sleep timer
+* Bath timer
+* Quick logging
+* Family invitation
+* QR scanning
+* Purchase flow
+* Critical user actions
+
+Never show an interstitial immediately before an activity is logged.
+
+---
+
+# 26. PAYWALL
+
+Create a reusable Premium Paywall component.
+
+Example:
+
+```text
+            ⭐ BabyCare Plus
+
+Track more. Understand more.
+
+Unlock:
+
+✓ Advanced analytics
+✓ More photo storage
+✓ Multiple babies
+✓ Custom dashboard
+✓ PDF reports
+✓ No ads
+✓ Advanced reminders
+
+────────────────────────
+
+Monthly
+₱129 / month
+
+Yearly
+₱999 / year
+⭐ BEST VALUE
+
+Lifetime
+₱1,999 one time
+
+[ Continue ]
+
+Restore Purchases
+```
+
+The paywall should be clean and trustworthy.
+
+Do not use manipulative dark patterns.
+
+---
+
+# 27. FEATURE LOCK SCREEN
+
+When a Free user accesses a Premium feature:
+
+Example:
+
+```text
+🔒 Advanced Analytics
+
+See your baby's activity patterns
+over 30 days, 90 days, or a custom
+date range.
+
+Available with BabyCare Plus.
+
+[ View Plus Plans ]
+```
+
+Do not simply disable the feature without explanation.
+
+---
+
+# 28. PRICING DISPLAY
+
+The application should display the price retrieved from Google Play whenever possible.
+
+Do not assume the displayed currency will always be PHP.
+
+The product catalog returned by Google Play should be treated as the authoritative display price.
+
+The application's default target market is the Philippines, so the configured products should initially use:
+
+* ₱129/month
+* ₱999/year
+* ₱1,999 lifetime
+
+But the application should remain technically capable of supporting localized pricing.
+
+---
+
+# 29. YEARLY PLAN PRESENTATION
+
+The yearly plan should be the visually preferred option.
+
+Example:
+
+```text
+┌───────────────────────────────┐
+│ ⭐ BEST VALUE                 │
+│                               │
+│ Plus Yearly                   │
+│ ₱999 / year                   │
+│                               │
+│ Save ₱549 vs monthly         │
+└───────────────────────────────┘
+```
+
+The savings calculation must be dynamically calculated from the configured monthly/yearly prices.
+
+Do not hardcode "35% savings."
+
+Calculate it.
+
+---
+
+# 30. LIFETIME PRESENTATION
+
+Present Lifetime as:
+
+```text
+┌───────────────────────────────┐
+│ 💎 LIFETIME                  │
+│                               │
+│ ₱1,999                        │
+│ One-time purchase             │
+│                               │
+│ No recurring subscription     │
+└───────────────────────────────┘
+```
+
+Make clear that this is a one-time purchase.
+
+Do not call it a subscription.
+
+---
+
+# 31. SUBSCRIPTION STATUS SCREEN
+
+Create:
+
+**Settings → Subscription & Billing**
+
+For Free:
+
+```text
+BabyCare Free
+
+You're currently using the Free plan.
+
+[ Upgrade to Plus ]
+```
+
+For Monthly:
+
+```text
+BabyCare Plus
+
+Monthly
+₱129/month
+
+Status:
+Active
+
+Next renewal:
+October 5, 2026
+
+[ Manage Subscription ]
+```
+
+For Yearly:
+
+```text
+BabyCare Plus
+
+Yearly
+₱999/year
+
+Status:
+Active
+
+Next renewal:
+October 5, 2027
+
+[ Manage Subscription ]
+```
+
+For Lifetime:
+
+```text
+BabyCare Plus
+
+Lifetime
+
+Status:
+Active
+
+One-time purchase
+
+[ Restore Purchases ]
+```
+
+---
+
+# 32. FAMILY ROOM BILLING DISPLAY
+
+The Family screen should show:
+
+```text
+Family Room
+
+Sofia's Family
+
+BabyCare Plus
+✓ Active
+
+Premium is shared with
+all members of this family room.
+```
+
+Do not expose unnecessary payment details.
+
+---
+
+# 33. ROOM OWNERSHIP EDGE CASE
+
+Handle the situation where the billing owner leaves the Family Room.
+
+The implementation must define and safely handle:
+
+* Billing owner leaves
+* Billing owner is removed
+* Room owner changes
+* Room is transferred
+* User deletes their account
+
+Do not automatically transfer billing ownership without a clearly defined and secure mechanism.
+
+The entitlement must remain consistent with the Google Play purchase and the application's account/room ownership model.
+
+If the current architecture cannot safely support transfer, prevent the billing owner from leaving without an explicit transfer/recovery flow.
+
+---
+
+# 34. ACCOUNT DELETION
+
+If a user deletes their account:
+
+Do not automatically delete the Family Room if other authorized members still depend on it.
+
+Before deletion, determine:
+
+* Is the user the room owner?
+* Is the user the billing owner?
+* Are there other administrators?
+* Does the room contain other members?
+
+Provide appropriate warnings and transfer/recovery flows.
+
+---
+
+# 35. FIREBASE SECURITY
+
+Premium status must not be trusted solely from the client.
+
+For example, do NOT allow the client to write:
+
+```json
+{
+  "plan": "lifetime"
+}
+```
+
+directly to Firebase.
+
+Premium entitlement must be updated only through trusted server-side mechanisms after valid purchase verification.
+
+Firebase Security Rules should prevent unauthorized clients from modifying billing/entitlement state.
+
+---
+
+# 36. FIREBASE DATA STRUCTURE
+
+Suggested:
+
+```text
+/rooms/{roomId}
+
+/rooms/{roomId}/billing
+
+/rooms/{roomId}/members
+
+/rooms/{roomId}/babies
+
+/rooms/{roomId}/activities
+
+/users/{userId}
+
+/users/{userId}/billingProfile
+```
+
+Billing information should be minimal on the client-readable side.
+
+Example room billing data:
+
+```json
+{
+  "plan": "plus_yearly",
+  "status": "active",
+  "expiresAt": 1810000000000,
+  "billingOwnerId": "userId"
+}
+```
+
+Sensitive verification data should remain server-controlled.
+
+---
+
+# 37. CLOUD FUNCTIONS
+
+Use Firebase Cloud Functions for trusted billing operations.
+
+Potential functions:
+
+```text
+verifyPurchase
+syncSubscription
+restoreEntitlement
+handleSubscriptionUpdate
+```
+
+The exact function architecture should follow the current Google Play Billing APIs and Firebase best practices.
+
+Functions should:
+
+* Validate authenticated user
+* Validate Family Room membership
+* Verify Google Play purchase
+* Determine product
+* Determine entitlement
+* Update Family Room billing state
+* Maintain timestamps
+* Handle expiration
+
+---
+
+# 38. WEBHOOK / REAL-TIME SUBSCRIPTION EVENTS
+
+Implement Google Play subscription lifecycle handling according to the current Google Play developer requirements.
+
+Handle events such as:
+
+* Purchase
+* Renewal
+* Cancellation
+* Expiration
+* Billing issue
+* Grace period
+* Pause where applicable
+* Refund/revocation where applicable
+
+The server should be capable of updating Firebase entitlement state even if the user does not open the mobile app.
+
+---
+
+# 39. REFUNDS / REVOCATIONS
+
+If Google Play reports a refunded or revoked purchase:
+
+The entitlement should be updated accordingly.
+
+Do not rely on the user opening the app to discover this.
+
+The server should synchronize entitlement state.
+
+---
+
+# 40. BILLING STATE AS SOURCE OF TRUTH
+
+Use this hierarchy:
+
+```text
+Google Play
+     ↓
+Server-side verification
+     ↓
+Firebase entitlement
+     ↓
+Mobile application
+```
+
+Do not use:
+
+```text
+Mobile application
+     ↓
+Firebase
+```
+
+as the authoritative billing process.
+
+---
+
+# 41. CACHING ENTITLEMENTS
+
+The mobile app may cache the last known entitlement for UX/performance.
+
+However:
+
+* Cached entitlements must not permanently grant access.
+* The app must refresh entitlement state.
+* Security-sensitive operations must rely on server-authoritative state.
+
+---
+
+# 42. NETWORK FAILURE DURING PURCHASE
+
+If payment succeeds but the app loses connection:
+
+Do not tell the user the purchase failed unless Google Play actually reports failure.
+
+Display:
+
+> We're confirming your purchase.
+
+Then synchronize with the server.
+
+Provide:
+
+> Restore Purchases
+
+if necessary.
+
+---
+
+# 43. DOUBLE PURCHASE PROTECTION
+
+Prevent accidental duplicate purchase requests.
+
+During purchase:
+
+* Disable purchase buttons
+* Show progress
+* Prevent repeated taps
+
+Handle transaction callbacks safely.
+
+Do not create duplicate entitlement records.
+
+---
+
+# 44. DEVELOPMENT / TEST MODE
+
+Create a billing abstraction that allows development/testing without real charges.
+
+Example:
+
+```typescript
+interface BillingService {
+  getProducts(): Promise<Product[]>;
+  purchaseProduct(productId: string): Promise<PurchaseResult>;
+  restorePurchases(): Promise<RestoreResult>;
+}
+```
+
+Use a mock implementation only in development/testing.
+
+Never allow a production build to use a fake billing implementation.
+
+---
+
+# 45. UI REQUIREMENTS
+
+The design should feel:
+
+* Trustworthy
+* Friendly
+* Family-oriented
+* Clean
+* Non-aggressive
+* Transparent
+
+Avoid aggressive "BUY NOW" language.
+
+Prefer:
+
+> Upgrade to BabyCare Plus
+
+rather than:
+
+> PAY NOW!!!
+
+The application should feel safe because users are trusting it with information about their children.
+
+---
+
+# 46. PAYWALL RULES
+
+The paywall must clearly communicate:
+
+1. What the user gets.
+2. How much it costs.
+3. Whether the payment is recurring.
+4. Whether the payment is one-time.
+5. How to restore purchases.
+6. Where to manage subscriptions.
+
+Never obscure recurring billing.
+
+For monthly:
+
+> ₱129/month — recurring subscription
+
+For yearly:
+
+> ₱999/year — recurring subscription
+
+For lifetime:
+
+> ₱1,999 — one-time purchase
+
+---
+
+# 47. NO DARK PATTERNS
+
+Do not:
+
+* Hide the close button
+* Misrepresent free trials
+* Pretend a subscription is one-time
+* Hide renewal information
+* Make cancellation unnecessarily difficult
+* Automatically select an expensive option without clear indication
+* Use misleading countdown timers
+* Claim fake discounts
+
+The pricing system must be transparent.
+
+---
+
+# 48. ANALYTICS FOR BUSINESS
+
+Create internal analytics events for:
+
+```text
+paywall_viewed
+plus_monthly_selected
+plus_yearly_selected
+lifetime_selected
+purchase_started
+purchase_completed
+purchase_failed
+purchase_restored
+subscription_cancelled
+subscription_expired
+premium_feature_locked
+```
+
+Do not include sensitive baby data in analytics events.
+
+For example, do NOT send:
+
+```text
+babyName
+diaperType
+feedingDetails
+```
+
+to analytics.
+
+---
+
+# 49. BUSINESS METRICS
+
+The architecture should make it possible to measure:
+
+### Acquisition
+
+* New users
+* New Family Rooms
+
+### Conversion
+
+* Free → Paid
+* Paywall conversion
+* Monthly conversion
+* Yearly conversion
+* Lifetime conversion
+
+### Retention
+
+* 7-day retention
+* 30-day retention
+* Monthly active families
+
+### Revenue
+
+* Monthly recurring revenue
+* Annual subscription revenue
+* Lifetime purchase revenue
+
+### Churn
+
+* Subscription cancellations
+* Subscription expirations
+
+Do not implement an unnecessarily complicated analytics system in the MVP.
+
+---
+
+# 50. TESTING REQUIREMENTS
+
+Test at minimum:
+
+## Free
+
+* Free user can use core tracking
+* Free user sees ads
+* Free user cannot access premium-only features
+* Free user sees correct storage limits
+
+## Monthly
+
+* Monthly purchase works
+* Monthly entitlement activates
+* Premium features unlock
+* Ads disappear
+* Subscription state displays correctly
+
+## Yearly
+
+* Yearly purchase works
+* Yearly entitlement activates
+* Premium features unlock
+* Correct price is displayed
+
+## Lifetime
+
+* Lifetime purchase works
+* Lifetime entitlement activates
+* Lifetime does not expire
+* Lifetime remains active after subscription expiration
+
+## Restore
+
+* Purchase can be restored
+* Reinstall does not permanently remove entitlement
+* Device/account restoration works according to Google Play rules
+
+## Expiration
+
+* Expired subscription returns to Free
+* Historical baby data remains intact
+* Premium-only features become locked
+
+## Family
+
+* Premium room members receive Premium access
+* Viewer permissions remain enforced
+* Non-members cannot access Premium room data
+
+## Security
+
+Test that a malicious client cannot directly modify:
+
+```text
+plan
+status
+expiresAt
+billingOwnerId
+purchase state
+```
+
+---
+
+# 51. UI TEST CASES
+
+Test:
+
+* Paywall
+* Pricing cards
+* Plan selection
+* Purchase loading state
+* Purchase success
+* Purchase failure
+* Purchase cancellation
+* Restore purchases
+* Subscription status
+* Expired subscription
+* Lifetime status
+* Family Premium status
+* Locked feature screens
+
+---
+
+# 52. IMPLEMENTATION ORDER
+
+Implement in this order:
+
+### Step 1
+
+Inspect the current project.
+
+Do not modify anything yet.
+
+Determine:
+
+* Expo SDK
+* React Native version
+* TypeScript version
+* Existing navigation
+* Firebase setup
+* Existing state management
+* Existing environment configuration
+* Existing build configuration
+* Existing authentication
+* Existing Family Room architecture
+
+### Step 2
+
+Create the billing architecture.
+
+Implement:
+
+* Product configuration
+* Plan types
+* Entitlement types
+* Feature gates
+* Billing service abstraction
+
+### Step 3
+
+Implement Free/Premium feature gating.
+
+Do this before connecting real Google Play billing.
+
+### Step 4
+
+Implement Premium UI.
+
+Create:
+
+* Paywall
+* Pricing cards
+* Subscription screen
+* Locked feature UI
+
+### Step 5
+
+Implement Google Play billing.
+
+Use the appropriate native-compatible solution for the current Expo project.
+
+### Step 6
+
+Implement server-side purchase verification.
+
+### Step 7
+
+Implement Firebase entitlement state.
+
+### Step 8
+
+Implement subscription lifecycle synchronization.
+
+### Step 9
+
+Implement restore purchases.
+
+### Step 10
+
+Implement ads for Free users.
+
+### Step 11
+
+Test all purchase and entitlement scenarios.
+
+### Step 12
+
+Perform security review.
+
+---
+
+# 53. DEVELOPMENT RULES
+
+Follow these rules throughout implementation:
+
+1. Inspect before modifying.
+2. Do not assume dependencies exist.
+3. Do not install unnecessary packages.
+4. Do not rewrite unrelated code.
+5. Reuse existing project architecture.
+6. Use TypeScript.
+7. Keep billing logic separate from UI.
+8. Keep entitlement logic separate from billing UI.
+9. Keep Firebase access behind appropriate services.
+10. Never trust the mobile client for Premium entitlement.
+11. Never hardcode purchase success.
+12. Never expose private Google credentials.
+13. Never log purchase tokens.
+14. Do not delete user data when Premium expires.
+15. Preserve all existing baby/activity functionality.
+16. Do not replace Firebase Realtime Database with Firestore.
+17. Do not break Expo Router.
+18. Run TypeScript validation after implementation.
+19. Run tests after each major billing component.
+20. Document any architecture decision that differs from this specification.
+
+---
+
+# 54. ACCEPTANCE CRITERIA
+
+The monetization implementation is complete when:
+
+### Plans
+
+The application supports:
+
+* Free — ₱0
+* Plus Monthly — ₱129/month
+* Plus Yearly — ₱999/year
+* Lifetime — ₱1,999
+
+### Free
+
+Users can use core baby tracking without payment.
+
+### Premium
+
+Users can purchase Premium and unlock Premium features.
+
+### Family
+
+One Premium purchase applies to the Family Room.
+
+### Monthly
+
+Monthly subscriptions renew through Google Play.
+
+### Yearly
+
+Yearly subscriptions renew through Google Play.
+
+### Lifetime
+
+Lifetime does not expire.
+
+### Restore
+
+Users can restore purchases.
+
+### Cancellation
+
+Users can manage recurring subscriptions through Google Play.
+
+### Expiration
+
+Expired subscriptions lose Premium access but retain user data.
+
+### Security
+
+Clients cannot directly grant themselves Premium.
+
+### Ads
+
+Free users can see ads.
+
+Premium users do not see ads.
+
+### UI
+
+Pricing and billing information is clear and transparent.
+
+### Backend
+
+Firebase contains authoritative entitlement state.
+
+### Testing
+
+Purchase, restoration, cancellation, expiration, family sharing, and security scenarios are tested.
+
+---
+
+# 55. FINAL AGENT INSTRUCTION
+
+Do not treat this as simply adding four pricing buttons.
+
+This is a complete monetization and entitlement system.
+
+The implementation must integrate:
+
+**Google Play Billing + Firebase + Family Rooms + Entitlements + Feature Gating + Ads + Secure Server Verification + Subscription Lifecycle Management.**
+
+Before implementation, inspect the current project and produce a short architecture assessment.
+
+Then implement incrementally.
+
+At the end of each implementation phase, report:
+
+```text
+Completed:
+- ...
+
+Changed:
+- ...
+
+Tests:
+- ...
+
+Known Issues:
+- ...
+
+Next:
+- ...
+```
+
+Do not claim the billing system is production-ready until real Google Play testing has been performed using the appropriate Google Play testing tracks and test accounts.
+
+The final architecture should allow the business owner to change prices and introduce additional plans later without rewriting the application.
+
+Prioritize:
+
+**Security → Billing correctness → Data integrity → User experience → Performance → Monetization optimization**
+
+The application must never risk losing a user's baby/activity data because of a billing problem.
