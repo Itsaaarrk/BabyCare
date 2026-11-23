@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import { BarChart } from '@/components/analytics/BarChart';
+import { InsightsCard } from '@/components/analytics/InsightsCard';
 import { Card } from '@/components/ui/Card';
 import { ChoiceChips } from '@/components/ui/ChoiceChips';
 import { DateField } from '@/components/ui/DateField';
@@ -76,6 +77,8 @@ export default function AnalyticsScreen() {
   return (
     <Screen>
       <Text variant="title">Analytics</Text>
+
+      <InsightsCard />
 
       <ChoiceChips options={PRESETS} value={preset} onChange={(v) => v && setPreset(v)} />
 

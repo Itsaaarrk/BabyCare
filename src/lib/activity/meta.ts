@@ -27,7 +27,12 @@ export const ACTIVITY_META: Record<ActivityType, ActivityMeta> = {
 
 const FEEDING_LABELS = { breast: 'Breastfeeding', bottle: 'Bottle', formula: 'Formula', other: 'Other' } as const;
 const DIAPER_LABELS = { pee: 'Pee', poop: 'Poop', both: 'Pee + Poop', dry: 'Dry' } as const;
-const BATH_LABELS = { afternoon: 'Afternoon bath', night: 'Night bath', other: 'Bath' } as const;
+const BATH_LABELS = {
+  morning: 'Morning bath',
+  afternoon: 'Afternoon bath',
+  night: 'Night bath',
+  other: 'Bath',
+} as const;
 const SIDE_LABELS = { left: 'left', right: 'right', both: 'both sides' } as const;
 
 export const FEEDING_TYPE_LABELS = FEEDING_LABELS;

@@ -8,6 +8,7 @@ import {
   BREAST_SIDES,
   DIAPER_TYPES,
   FEEDING_TYPES,
+  defaultBathType,
   isTimedType,
   type ActivityDetails,
   type ActivityRecord,
@@ -71,7 +72,7 @@ export function emptyFormValues(type: ActivityType, startedAt = Date.now()): Act
     title: '',
     // One-tap defaults for the most common choices.
     feedingType: type === 'feeding' ? 'breast' : undefined,
-    bathType: type === 'bath' ? 'night' : undefined,
+    bathType: type === 'bath' ? defaultBathType(startedAt) : undefined,
     diaperType: undefined,
     side: undefined,
   };

@@ -16,14 +16,10 @@ import {
   toFormValues,
   type ActivityFormValues,
 } from '@/features/activities/schemas';
-import {
-  BATH_TYPE_LABELS,
-  DIAPER_TYPE_LABELS,
-  FEEDING_TYPE_LABELS,
-} from '@/lib/activity/meta';
+import { DIAPER_TYPE_LABELS, FEEDING_TYPE_LABELS } from '@/lib/activity/meta';
 import {
   AMOUNT_UNITS,
-  BATH_TYPES,
+  BATH_CHOICES,
   BREAST_SIDES,
   DIAPER_TYPES,
   FEEDING_TYPES,
@@ -190,7 +186,11 @@ export function ActivityForm({ type, activity, initial, submitLabel, onSubmit, e
           render={({ field, fieldState }) => (
             <ChoiceChips
               label="Bath type"
-              options={options(BATH_TYPES, { afternoon: 'Afternoon', night: 'Night', other: 'Other' })}
+              options={options(
+                // An older entry saved as plain "Bath" keeps that choice until it's changed.
+                field.value === 'other' ? [...BATH_CHOICES, 'other' as const] : BATH_CHOICES,
+                { morning: 'Morning', afternoon: 'Afternoon', night: 'Night', other: 'Bath' },
+              )}
               value={field.value}
               onChange={field.onChange}
               error={fieldState.error?.message}

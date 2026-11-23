@@ -206,7 +206,7 @@
                     ".validate": "newData.isString() && (newData.val() === 'pee' || newData.val() === 'poop' || newData.val() === 'both' || newData.val() === 'dry')"
                   },
                   "bathType": {
-                    ".validate": "newData.isString() && (newData.val() === 'afternoon' || newData.val() === 'night' || newData.val() === 'other')"
+                    ".validate": "newData.isString() && (newData.val() === 'morning' || newData.val() === 'afternoon' || newData.val() === 'night' || newData.val() === 'other')"
                   },
                   "title": {
                     ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80"
