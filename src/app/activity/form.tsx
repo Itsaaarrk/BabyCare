@@ -12,7 +12,7 @@ import { ACTIVITY_META } from '@/lib/activity/meta';
 import { createActivity, updateActivity } from '@/services/activities/activityService';
 import {
   ACTIVITY_TYPES,
-  BATH_TYPES,
+  BATH_CHOICES,
   BREAST_SIDES,
   FEEDING_TYPES,
   isTimedType,
@@ -72,7 +72,7 @@ export default function ActivityFormScreen() {
           endedAt: now,
           feedingType: oneOf(FEEDING_TYPES, params.feedingType) ?? emptyFormValues(type).feedingType,
           side: oneOf(BREAST_SIDES, params.side),
-          bathType: oneOf(BATH_TYPES, params.bathType) ?? emptyFormValues(type).bathType,
+          bathType: oneOf(BATH_CHOICES, params.bathType) ?? emptyFormValues(type, now - 15 * MINUTE).bathType,
         }
       : {};
 

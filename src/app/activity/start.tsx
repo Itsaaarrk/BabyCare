@@ -19,10 +19,11 @@ import { runningTimers } from '@/lib/activity/summary';
 import { createActivity, finishActivity } from '@/services/activities/activityService';
 import {
   ACTIVITY_TYPES,
-  BATH_TYPES,
+  BATH_CHOICES,
   BREAST_SIDES,
   DIAPER_TYPES,
   FEEDING_TYPES,
+  defaultBathType,
   type ActivityType,
   type BathType,
   type BreastSide,
@@ -41,7 +42,7 @@ export default function StartActivityScreen() {
 
   const [feedingType, setFeedingType] = useState<FeedingType | undefined>('breast');
   const [side, setSide] = useState<BreastSide | undefined>();
-  const [bathType, setBathType] = useState<BathType | undefined>('night');
+  const [bathType, setBathType] = useState<BathType | undefined>(() => defaultBathType());
   // Stops a quick double tap from logging twice.
   const [saved, setSaved] = useState(false);
 
@@ -179,7 +180,7 @@ export default function StartActivityScreen() {
       {type === 'bath' ? (
         <ChoiceChips
           label="Bath type"
-          options={BATH_TYPES.map((value) => ({ value, label: BATH_TYPE_LABELS[value].replace(' bath', '') }))}
+          options={BATH_CHOICES.map((value) => ({ value, label: BATH_TYPE_LABELS[value].replace(' bath', '') }))}
           value={bathType}
           onChange={setBathType}
         />

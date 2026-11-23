@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { ActiveTimerCard } from '@/components/activity/ActiveTimerCard';
 import { QuickActionGrid } from '@/components/activity/QuickActionGrid';
+import { QuickNoteButtons } from '@/components/activity/QuickNoteButtons';
 import { SummaryCards } from '@/components/activity/SummaryCards';
 import { BabyAvatar } from '@/components/baby/BabyAvatar';
 import { SyncBanner } from '@/components/SyncBanner';
@@ -137,10 +138,13 @@ export default function HomeScreen() {
       ))}
 
       {canAdd ? (
-        <QuickActionGrid
-          running={runningTypes}
-          onSelect={(type) => router.push({ pathname: '/activity/start', params: { type } })}
-        />
+        <>
+          <QuickActionGrid
+            running={runningTypes}
+            onSelect={(type) => router.push({ pathname: '/activity/start', params: { type } })}
+          />
+          <QuickNoteButtons />
+        </>
       ) : (
         <Card>
           <Text muted>You can view {current.name}’s day but not log activities.</Text>

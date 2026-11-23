@@ -10,8 +10,18 @@ export type BreastSide = (typeof BREAST_SIDES)[number];
 export const DIAPER_TYPES = ['pee', 'poop', 'both', 'dry'] as const;
 export type DiaperType = (typeof DIAPER_TYPES)[number];
 
-export const BATH_TYPES = ['afternoon', 'night', 'other'] as const;
+/** Every bath type that can be stored. `other` (shown as plain "Bath") is kept only for older entries. */
+export const BATH_TYPES = ['morning', 'afternoon', 'night', 'other'] as const;
 export type BathType = (typeof BATH_TYPES)[number];
+
+/** Bath types offered when logging. */
+export const BATH_CHOICES: readonly BathType[] = ['morning', 'afternoon', 'night'];
+
+/** A sensible bath type for the time of day (device clock): before noon, before 5 pm, then night. */
+export function defaultBathType(now = Date.now()): BathType {
+  const hour = new Date(now).getHours();
+  return hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'night';
+}
 
 export const AMOUNT_UNITS = ['ml', 'oz'] as const;
 export type AmountUnit = (typeof AMOUNT_UNITS)[number];
