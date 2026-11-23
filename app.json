@@ -3,7 +3,7 @@
     "name": "BabyCare",
     "slug": "babycare",
     "scheme": "babycare",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -21,7 +21,11 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 3
+      "versionCode": 4,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -52,6 +56,13 @@
       ],
       "@react-native-google-signin/google-signin",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6714e385-7f50-43dd-87b6-0f137afff52e"
+      }
+    },
+    "owner": "x10241"
   }
 }

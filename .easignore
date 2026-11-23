@@ -1,0 +1,27 @@
+# Same as .gitignore, except the app's public Firebase config (.env, google-services.json),
+# which EAS cloud builds need. Those stay out of git.
+node_modules/
+.expo/
+dist/
+web-build/
+ios/
+android/
+*.log
+.DS_Store
+.claude/
+
+.env.*
+!.env.example
+*.pem
+*.p12
+*.key
+*.jks
+serviceAccount*.json
+GoogleService-Info.plist
+
+.firebase/
+firebase-debug.log
+*-debug.log
+
+functions/
+tests/
